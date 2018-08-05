@@ -18,6 +18,7 @@ try:
     lines = re.split(r'(\\n)', rmvComents)                 #  divide em linhas
     tokens = list()
 
+    #lines é string. isso aqui vai transformar em um array onde cada elemento é uma linha
     for line in lines:
         tokens.append(re.split(r'\s', lines))
 
@@ -25,7 +26,7 @@ try:
 
     for line in lines:
         for token in tokens:
-            tempToken = re.split(r'(((and)|(or)|(<>)|(<=)|(>=)|(:=))|(\;|\.|\:|\(|\)|\,\+|-|=|\*|/|(<)|(>)))',token)
+            tempToken = re.split(r' ',token)
 
             for temp in tempToken:
                 if temp in delimiters:
@@ -51,6 +52,8 @@ try:
                         table.write(temp + ' | ' + 'IDENTIFICADOR' + ' | ' + count)
         count++
 #Falta ainda tratar os casos como: 43huesa
+#Falta tratar operador de atribuição
+#Falta tratar casos como: 45/2, 56-55, z=15, etc.
 finally:
     progFile.close()
     table.close()   
