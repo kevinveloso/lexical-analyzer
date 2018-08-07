@@ -20,12 +20,15 @@ try:
 
     # lines é string. isso aqui vai transformar em um array onde cada elemento é uma linha
     for line in lines:
-        tokens.append(re.split(r'\s', line))
+        tokens.append(re.split(r'\s|(;|\.|:|\(|\)|,)', line))
 
     # Remove os espaços em branco q ngm sabe pq eles foram parar la!!!
     for token in tokens:
-        while '' in token:
+        while ('') in token:
             token.remove('')
+        while None in token:
+            token.remove(None)
+        print(token)
 
 
 
