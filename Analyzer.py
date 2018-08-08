@@ -4,9 +4,6 @@ try:
     progFile = open('program.txt', 'r')
     table = open('table.txt', 'w')
 
-    #keywords = ['program', 'var', 'integer', 'real',
-    # 'boolean', 'procedure', 'begin', 'end', 'if',
-    # 'then', 'else', 'while', 'do', 'not']
     delimiters = [';', '.', ':', '(', ')', ':=', ',']
     relationalOperators = ['=', '<', '>', '<=', '>=', '<>']
     addOperators = ['+', '-', 'or']
@@ -20,7 +17,7 @@ try:
 
     # lines eh string. isso aqui vai transformar em um array onde cada elemento eh uma linha
     for line in lines:
-        tokens.append(re.split(r'\s|(<>)|(:=)|(;|\.|:|\(|\)|,|<|>|=|\+|\-|\*|\\)', line))
+        tokens.append(re.split(r'\s|(^and)|(^or)|(<>)|(:=)|(;|\.|:|\(|\)|,|<|>|=|\+|\-|\*|\\|\/)', line))
 
     # Remove os espacos em branco q ngm sabe pq eles foram parar la!!!
     for token in tokens:
@@ -28,7 +25,6 @@ try:
             token.remove('')
         while None in token:
             token.remove(None)
-
     count = 1
 
     # for line in lines:  REMOVER PQ NAO TA SERVINDO DE NADA// MAS AINDA PRECISA DIVIDIR MAIS PARA PEGAR OS ':'
@@ -63,9 +59,7 @@ try:
                 elif re.match(r'_*[a-zA-Z]+[0-9]*_*', temp):
                     table.write(str(temp) + ' | ' + 'IDENTIFICADOR' + ' | ' + str(count) + '\n' )
         count+=1
-#Falta ainda tratar os casos como: 43huesa
-#Falta tratar operador de atribuicao
-#Falta tratar casos como: 45/2, 56-55, z=15, etc.
+
 finally:
     progFile.close()
     table.close()   
