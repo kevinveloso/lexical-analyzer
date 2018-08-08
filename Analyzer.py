@@ -27,7 +27,6 @@ try:
             token.remove('')
         while None in token:
             token.remove(None)
-        print(token)
 
     count = 1
 
@@ -36,7 +35,7 @@ try:
         tempToken = token
 
         for temp in tempToken:
-            if re.match(r'[0-9]*([a-z].*|[A-Z].*).*', temp):
+            if re.match(r'[0-9]+([a-z].*|[A-Z].*).*', temp):
                 aux = temp
                 table.write(re.sub(r'[a-z].*|[A-Z].*', '', temp) + ' | ' + 'INTEIRO' + ' | '  + str(count) + '\n' )     
                 temp = re.sub(r'[0-9]', '', aux)
