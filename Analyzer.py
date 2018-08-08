@@ -1,3 +1,5 @@
+# Alunos: Fernando Souza (11218354) e Kevin Veloso (11318626)
+
 import re
 
 try:
@@ -19,7 +21,7 @@ try:
     for line in lines:
         tokens.append(re.split(r'\s|(^and)|(^or)|(<>)|(:=)|([0-9]+\.[0-9]*)|(;|:|\(|\)|,|<|>|=|\+|\.||\-|\*|\\|\/)', line))
 
-    # Remove os espacos em branco q ngm sabe pq eles foram parar la!!!
+    # Remove os espacos em branco seguidos
     for token in tokens:
         while ('') in token:
             token.remove('')
@@ -29,12 +31,12 @@ try:
 
     count = 1
 
-    # for line in lines:  REMOVER PQ NAO TA SERVINDO DE NADA// MAS AINDA PRECISA DIVIDIR MAIS PARA PEGAR OS ':'
+    
     for token in tokens:
         tempToken = token
 
         for temp in tempToken:
-            if re.match(r'[0-9].*', temp):
+            if re.match(r'[0-9]*([a-z].*|[A-Z].*).*', temp):
                 aux = temp
                 table.write(re.sub(r'[a-z].*|[A-Z].*', '', temp) + ' | ' + 'INTEIRO' + ' | '  + str(count) + '\n' )     
                 temp = re.sub(r'[0-9]', '', aux)
