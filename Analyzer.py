@@ -17,7 +17,7 @@ try:
 
     # lines eh string. isso aqui vai transformar em um array onde cada elemento eh uma linha
     for line in lines:
-        tokens.append(re.split(r'\s|(^and)|(^or)|(<>)|(:=)|(;|\.|:|\(|\)|,|<|>|=|\+|\-|\*|\\|\/)', line))
+        tokens.append(re.split(r'\s|(^and)|(^or)|(<>)|(:=)|([0-9]+\.[0-9]*)|(;|:|\(|\)|,|<|>|=|\+|\.||\-|\*|\\|\/)', line))
 
     # Remove os espacos em branco q ngm sabe pq eles foram parar la!!!
     for token in tokens:
@@ -25,6 +25,8 @@ try:
             token.remove('')
         while None in token:
             token.remove(None)
+        print(token)
+
     count = 1
 
     # for line in lines:  REMOVER PQ NAO TA SERVINDO DE NADA// MAS AINDA PRECISA DIVIDIR MAIS PARA PEGAR OS ':'
