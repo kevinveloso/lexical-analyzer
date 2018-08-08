@@ -18,18 +18,16 @@ try:
     lines = re.split(r'\n', rmvComents)                 #  divide em linhas
     tokens = list()
 
-    # lines é string. isso aqui vai transformar em um array onde cada elemento é uma linha
+    # lines eh string. isso aqui vai transformar em um array onde cada elemento eh uma linha
     for line in lines:
         tokens.append(re.split(r'\s|(<>)|(:=)|(;|\.|:|\(|\)|,|<|>|=|\+|\-|\*|\\)', line))
 
-    # Remove os espaços em branco q ngm sabe pq eles foram parar la!!!
+    # Remove os espacos em branco q ngm sabe pq eles foram parar la!!!
     for token in tokens:
         while ('') in token:
             token.remove('')
         while None in token:
             token.remove(None)
-
-
 
     count = 1
 
@@ -38,11 +36,16 @@ try:
         tempToken = token
 
         for temp in tempToken:
+            if re.match(r'[0-9].*', temp):
+                aux = temp
+                table.write(re.sub(r'[a-z].*|[A-Z].*', '', temp) + ' | ' + 'INTEIRO' + ' | '  + str(count) + '\n' )     
+                temp = re.sub(r'[0-9]', '', aux)
+
             if temp in delimiters:
                 table.write(temp + ' | ' + 'DELIMITADOR' + ' | '  + str(count) + '\n' )
             
             elif temp in addOperators:
-                table.write(temp + ' | ' + 'OPERADOR DE ADIÇÃO' + ' | ' + str(count) + '\n' )
+                table.write(temp + ' | ' + 'OPERADOR DE ADICAO' + ' | ' + str(count) + '\n' )
             
             elif temp in multOperators:
                 table.write(temp + ' | ' + 'OPERADOR MULTI' + ' | '  + str(count) + '\n' )
@@ -61,7 +64,7 @@ try:
                     table.write(str(temp) + ' | ' + 'IDENTIFICADOR' + ' | ' + str(count) + '\n' )
         count+=1
 #Falta ainda tratar os casos como: 43huesa
-#Falta tratar operador de atribuição
+#Falta tratar operador de atribuicao
 #Falta tratar casos como: 45/2, 56-55, z=15, etc.
 finally:
     progFile.close()

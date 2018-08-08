@@ -2,6 +2,7 @@ program test; {programa exemplo}
 var
     valor1: integer;
     valor2: real;
+    42if:=teste;
 begin
     valor1 := 10;
 end.
