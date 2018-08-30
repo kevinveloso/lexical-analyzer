@@ -3,8 +3,8 @@
 import re
 
 try:
-    progFile = open('program.txt', 'r')
-    table = open('table.txt', 'w')
+    progFile = open('./data/program.txt', 'r')
+    table = open('./data/table.txt', 'w')
 
     delimiters = [';', '.', ':', '(', ')', ':=', ',']
     relationalOperators = ['=', '<', '>', '<=', '>=', '<>']
@@ -13,7 +13,7 @@ try:
 
     program = progFile.read()
 
-    rmvComents = re.sub(r'({.*\}|(\t))', "", program)     #  remove os comentarios e tabulacoes
+    rmvComents = re.sub(r'({.*\}|(//.*)|(\t))', "", program)     #  remove os comentarios e tabulacoes
     lines = re.split(r'\n', rmvComents)                 #  divide em linhas
     tokens = list()
 
@@ -21,7 +21,7 @@ try:
 
     # lines eh string. isso aqui vai transformar em um array onde cada elemento eh uma linha
     for line in lines:
-        tokens.append(re.split(r'\s|(^and)|(^or)|(<>)|(:=)|([0-9]+\.[0-9]*)|(;|:|\(|\)|,|<|>|=|\+|\.|\-|\*|\\|\/)', line))
+        tokens.append(re.split(r'(\s)|(^and)|(^or)|(<>)|(:=)|([0-9]+\.[0-9]*)|(;|:|\(|\)|,|<|>|=|\+|\.|\-|\*|\\|\/)', line))
 
     # Remove os espacos em branco seguidos
     for token in tokens:

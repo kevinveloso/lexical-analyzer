@@ -6,8 +6,3 @@ var
 begin
     valor1 := 10.3;
 end.
-
-usahfg3908yrh1unh21hinq
-12313
-mork1okr
-integer program ========== :=---:/asdnoasnhdo12341/////////////////154utfu
