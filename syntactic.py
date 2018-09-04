@@ -6,6 +6,18 @@ TOKEN = 0
 CLASS = 1
 LINE_NUMBER = 2
 
+variableTypes = ['integer', 'real', 'boolean'] 
+programVariables = list()
+
+numberSignals = ['-', '+']
+relationalOperators = ['=', '<', '>', '<=', '>=', '<>']
+addOperators = ['+', '-', 'or']
+multOperators = ['*', '/', 'and']
+
+###
+#   Checa se a linha eh um identificador do programa
+#   retorna true ou false
+###
 def isProgramId(line):
     isProgId = False
     
@@ -16,9 +28,12 @@ def isProgramId(line):
                     
     return isProgId
 
+###
+#   Checa se a linha eh uma declaracao de variavel
+#   retorna true ou false
+###
 def isVarDeclaration(line):
-    isVarDec = False
-    variableTypes = ['integer', 'real', 'boolean']  
+    isVarDec = False 
 
     if(line[0][CLASS] == 'IDENTIFICADOR'):  
         if(line[1][TOKEN] == ':'):
@@ -36,15 +51,105 @@ def isVarDeclaration(line):
                             break
                 i += 2
 
+        if(isVarDec):
+            for token in line:
+                if(token[CLASS] == 'IDENTIFICADOR'):
+                    programVariables.append(token[TOKEN])
+
     return isVarDec     
 
-# def nextToken(self):
-#         if (self.index + 1) < len(self.list_tokens):
-#             self.index += 1
-#             return self.list_tokens[self.index]
-#         else:
-#             sys.exit("out range")
+###
+#   Checa se a linha eh uma atribuicao de variavel
+#   retorna true ou false
+###
+def isVariableAttr(line):
+    isVariableAttr = False
 
+    while line :
+
+        if line[0][CLASS] == 'IDENTIFICADOR':
+            if line[0][TOKEN] in programVariables:
+                line.remove(line[0])
+
+                if line[0][TOKEN] == ':=':
+                    line.remove(line[0])
+
+                    if isExpression(line[0]):
+                        isVaribleAttr = True
+
+    return isVariableAttr
+
+###
+#   Checa se a linha eh uma expressao
+#   retorna true ou false
+###
+def isExpression(line, flag = True):
+    isExpression = False
+
+    while line :
+
+        if (line[0][TOKEN] in numberSignals) and (flag):
+            line.remove(line[0])
+
+            if (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL'):
+                line.remove(line[0])
+
+                if (line[0][TOKEN] in relationalOperators) or (line[0][TOKEN] in addOperators) or (line[0][TOKEN] in multOperators):
+                    line.remove(line[0])
+
+                    if isExpression(line, False):
+                        isExpression = True
+
+                elif line[0][TOKEN] == ';' :
+                    isExpression = True    
+
+        elif (line[0][TOKEN] == 'not') and (flag) :
+            line.remove(line[0])
+
+            if isExpression(line, False):
+                isExpression = True
+
+        elif ((line[0][TOKEN] == 'true') or (line[0][TOKEN] == 'false')) and (flag):
+            line.remove(line[0])
+
+            if line[0][TOKEN] == ';'
+                isExpression = True
+
+        elif (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL') or (line[0][TOKEN] in programVariables):
+            line.remove(line[0])
+
+            if (line[0][TOKEN] in relationalOperators) or (line[0][TOKEN] in addOperators) or (line[0][TOKEN] in multOperators):
+                line.remove(line[0])
+
+                if isExpression(line, False):
+                    isExpression = True
+
+            elif line[0][TOKEN] == ';' :
+                isExpression = True 
+        
+            
+    return isExpression
+
+
+###
+#   Checa se a linha eh um comando
+#   retorna true ou false
+###
+def isCommand(line):
+    isCommand = False
+    
+    while line :
+
+        if token[CLASS] == 'IDENTIFICADOR':
+            if token[TOKEN] in programVariables:
+                isCommand = isVariableAttr(line)
+            else:
+                break
+        elif token[CLASS] == 'PALAVRARESERVADA':
+
+###
+#   ANALIZADOR SINTATICO
+###
 with open('./data/table.txt', 'r') as programTable:
 
     lines = programTable.read()
@@ -92,7 +197,7 @@ with open('./data/table.txt', 'r') as programTable:
             while programLines: #CHECA PARA TODAS AS LINHAS SE VALEM COMO DEFINICAO DE TIPO DE VARIAVEL
                 if(isVarDeclaration(programLines[0])):
                     programLines.remove(programLines[0])  
-                elif (programLines[0][TOKEN] == 'begin'):
+                elif (programLines[0][0][TOKEN] == 'begin'):
                     break
                 else:
                     print('ERRO SINTATICO! TELA AZUL!')
