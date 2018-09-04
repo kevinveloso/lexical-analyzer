@@ -17,8 +17,6 @@ try:
     lines = re.split(r'\n', rmvComents)                 #  divide em linhas
     tokens = list()
 
-    print(lines)
-
     # lines eh string. isso aqui vai transformar em um array onde cada elemento eh uma linha
     for line in lines:
         tokens.append(re.split(r'(\s)|(^and)|(^or)|(<>)|(:=)|([0-9]+\.[0-9]*)|(;|:|\(|\)|,|<|>|=|\+|\.|\-|\*|\\|\/)', line))
