@@ -28,6 +28,80 @@ def isProgramId(line):
                     
     return isProgId
 
+# ###
+# #   Checa se a token eh um fator
+# #   retorna true ou false
+# ###
+# def isFactor(token):
+#     isFactor = False
+
+ 
+#     if token[0][CLASS] == 'IDENTIFICADOR':
+#         if token[1][TOKEN] == '(': 
+#             if not isExpressionList(token):
+#                 return False
+#         isFactor = True
+
+#     elif token[0][CLASS] == 'INTEGER' or token[0][CLASS] == 'REAL':
+#         isFactor = True
+
+#     elif token[0][TOKEN] == 'true' or token[0][TOKEN] == 'false':
+#         isFactor = True
+
+#     elif token[0][TOKEN] == '(':
+#         isFactor = isExpression(token)
+
+#     elif token[0][TOKEN] == 'not':
+#         token.remove(token[0])
+#         isFactor = isFactor(token)
+    
+#     return isFactor
+
+# ###
+# #   Checa se a token eh um termo
+# #   retorna true ou false
+# ###
+# def isTerm(token):
+#     isTerm = False
+
+#     if len(token) = 0:
+#         isTerm = True
+
+#     if isFactor(token[0]):
+#         token.remove(token[0])
+        
+#         if len(token) > 0:
+#             if token[0][TOKEN] in multOperators:
+#                 token.remove(token[0])
+                
+#                 if isFactor(token[0]) :
+#                     token.remove(token[0])
+
+#                     isTerm(token)
+#         else:
+#             isTerm = True
+
+#     return isTerm
+
+###
+#   Checa se a token eh uma exprecao simples
+#   retorna true ou false
+###
+# def isSimpleExpression(token):
+#     isSimpleExp = False
+
+#     if len(token) == 0:
+#         isSimpleExp = True
+#     elif token[0][TOKEN] in numberSignals:
+#         token.remove(token[0])
+
+#         if isTerm(token):
+#             token.remove(token[0])
+#             isSimpleExp = True
+#         if
+    
+
+#     return isSimpleExp
 ###
 #   Checa se a linha eh uma declaracao de variavel
 #   retorna true ou false
@@ -74,8 +148,9 @@ def isVariableAttr(line):
                 if line[0][TOKEN] == ':=':
                     line.remove(line[0])
 
-                    if isExpression(line[0]):
-                        isVaribleAttr = True
+                    if isExpression(line):
+                        isVariableAttr = True
+                        break
 
     return isVariableAttr
 
@@ -85,10 +160,11 @@ def isVariableAttr(line):
 ###
 def isExpression(line, flag = True):
     isExpression = False
-
+    parenthesisCount = list()
+    
     while line :
 
-        if (line[0][TOKEN] in numberSignals) and (flag):
+      if (line[0][TOKEN] in numberSignals) and (flag):
             line.remove(line[0])
 
             if (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL'):
@@ -99,21 +175,25 @@ def isExpression(line, flag = True):
 
                     if isExpression(line, False):
                         isExpression = True
+                        break
 
                 elif line[0][TOKEN] == ';' :
-                    isExpression = True    
+                    isExpression = True
+                    break    
 
         elif (line[0][TOKEN] == 'not') and (flag) :
             line.remove(line[0])
 
             if isExpression(line, False):
                 isExpression = True
+                break
 
         elif ((line[0][TOKEN] == 'true') or (line[0][TOKEN] == 'false')) and (flag):
             line.remove(line[0])
 
-            if line[0][TOKEN] == ';'
+            if line[0][TOKEN] == ';':
                 isExpression = True
+                break
 
         elif (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL') or (line[0][TOKEN] in programVariables):
             line.remove(line[0])
@@ -123,10 +203,23 @@ def isExpression(line, flag = True):
 
                 if isExpression(line, False):
                     isExpression = True
+                    break
 
             elif line[0][TOKEN] == ';' :
                 isExpression = True 
-        
+                break
+
+    #CONTROLE DE ABERTURA E FECHAMENTO DE PARENTESES
+    parCount = 0
+
+    for par in parenthesisCount :
+        if par == '(':
+            parCount += 1
+        elif par == ')':
+            parCount -=1
+    
+    if parCount is not 0:
+        isExpression = False
             
     return isExpression
 
@@ -146,6 +239,8 @@ def isCommand(line):
             else:
                 break
         elif token[CLASS] == 'PALAVRARESERVADA':
+            True
+    return isCommand
 
 ###
 #   ANALIZADOR SINTATICO
@@ -202,12 +297,15 @@ with open('./data/table.txt', 'r') as programTable:
                 else:
                     print('ERRO SINTATICO! TELA AZUL!')
                     break
+        linesadad = [['valor1', 'IDENTIFICADOR', '7'], [':=', 'DELIMITADOR', '7'], ['10.3', 'REAL', '7'], [';','DELIMITADOR', '7']]
+        print(isVariableAttr(linesadad))
+    
 
-        while programLines:
-            if(programLines[0][0][TOKEN] == 'begin'):
-                print('comecou com begin')
-                programLines.remove(programLines[0])    
-            break    
+        # while programLines:
+        #     if(programLines[0][0][TOKEN] == 'begin'):
+        #         print('comecou com begin')
+        #         programLines.remove(programLines[0])    
+        #     break    
 
                     
 

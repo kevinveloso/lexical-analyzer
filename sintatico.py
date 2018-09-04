@@ -21,14 +21,16 @@ multOperators = ['*', '/', 'and']
 def isProgramId(line):
     isProgId = False
     
-    if(line[0][TOKEN] == "program"):
-            if(line[1][CLASS] == "IDENTIFICADOR"):
-                if(line[2][TOKEN] == ";"):
+    if(line[0][0][TOKEN] == "program"):
+            if(line[0][1][CLASS] == "IDENTIFICADOR"):
+                if(line[0][2][TOKEN] == ";"):
+                    line.remove(line[0])
+
                     var_declaration(line)
-                    subprogram_declaration(line)
+                    subprograms_declaration(line)
                     # compost_command(line)
                     if (line[0][TOKEN] == '.'):
-                        print('DEU BOM FDP')
+                        print('DEU BOM')
                         isProgId = True
                     
     return isProgId
@@ -80,17 +82,17 @@ def subprograms_declarations__(line):
             pass    
 
 def var_declaration(line):
-    if(line[0][TOKEN] == 'var'):
+    if(line[0][0][TOKEN] == 'var'):
         line.remove(line[0])
         var_declaration_list(line)
 
 def var_declaration_list(line):
-    if(list_identifiers(line)):
-        if(line[0][TOKEN] == ':'):
-            line.remove(line[0])
-            if(line[0][TOKEN] in variableTypes):
-                line.remove(line[0])
-                if(line[0][TOKEN] == ';'):
+    if(not list_identifiers(line)):
+        if(line[0][0][TOKEN] == ':'):
+            line[0].remove(line[0][0])
+            if(line[0][0][TOKEN] in variableTypes):
+                line[0].remove(line[0][0])
+                if(line[0][0][TOKEN] == ';'):
                     line.remove(line[0])
                     var_declaration_list__(line)
                 else:
@@ -105,32 +107,34 @@ def var_declaration_list(line):
 
 def var_declaration_list__(line):
     if(list_identifiers(line)):
-        if(line[0][TOKEN] == ':'):
-            line.remove(line[0])
-            if(line[0][TOKEN] in variableTypes):
-                line.remove(line[0])
-                if(line[0][TOKEN] == ';'):
+        if(line[0][0][TOKEN] == ':'):
+            line[0].remove(line[0][0])
+            if(line[0][0][TOKEN] in variableTypes):
+                line[0].remove(line[0][0])
+                if(line[0][0][TOKEN] == ';'):
                     line.remove(line[0])
-                    var_declaration_list__(line)
+                    var_declaration_list(line)
                 else:
                     sys.exit('11 - FALTOU ;')
             else:
                 sys.exit('12 - ERROU O TIPO')
         else:
             sys.exit('13 - FALTOU :')
-
+    else:
+        var_declaration_list(line)
 
 
 def subprogram_declaration(line):
     isSubDec = False
-    if(line[0][TOKEN] == 'procedure'):
+    if(line[0][0][TOKEN] == 'procedure'):
         line.remove(line[0])
-        if(line[0][CLASS] == 'IDENTIFICADOR'):
+        if(line[0][0][CLASS] == 'IDENTIFICADOR'):
             line.remove(line[0])
             arguments(line)
-            if(line[0][TOKEN] == ';'):
+            if(line[0][0][TOKEN] == ';'):
                 line.remove(line[0])
-                if line[0][TOKEN] == 'var': isVarDeclaration(line)
+                if line[0][0][TOKEN] == 'var': 
+                    isVarDeclaration(line)
                 subprograms_declarations__(line)
                 composed_commands(line)
                 isSubDec = True
@@ -142,10 +146,10 @@ def subprogram_declaration(line):
             sys.exit('3 - FALTOU IDENTIFICADOR')
 
 def arguments(line):
-    if(line[0][TOKEN] == '('):
+    if(line[0][0][TOKEN] == '('):
         line.remove(line[0])
         list_parameters(line)
-        if(line[0][TOKEN] == ')'):
+        if(line[0][0][TOKEN] == ')'):
             line.remove(line[0])
         else:
             sys.exit('4 - FALTOU ) ')
@@ -154,39 +158,43 @@ def arguments(line):
 
 def list_parameters(line):
     list_identifiers(line)
-    if (line[0][TOKEN] == ':'):
+    if (line[0][0][TOKEN] == ':'):
         line.remove(line[0])
-        if(line[0][TOKEN] in variableTypes):
+        if(line[0][0][TOKEN] in variableTypes):
             line.remove(line[0])
             list_parameters__(line)
         else:
             sys.exit('6 - ERROU O TIPO')
 
 def list_parameters__(line):
-    if(line[0][TOKEN] == ';'):
+    if(line[0][0][TOKEN] == ';'):
         line.remove(line[0])
         if (not list_identifiers(line)) :
-            if (line[0][TOKEN] == ':'):
-                line.remove(line[0])
+            if (line[0][0][TOKEN] == ':'):
+                line.remove(line[0][0])
                 if(line[0][TOKEN] in variableTypes):
                     line.remove(line[0])
                     list_parameters__(line)
+            else:
+                sys.exit('14 - ERRO SINTATICO :')
 
 
 def list_identifiers(line):
     isListID = False
-    if(line[0][TOKEN] == 'IDENTIFICADOR'):
-        line.remove(line[0])
-        list_identifiers__(line)
-        return isListID
+    if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        isListID = list_identifiers__(line)
+        
+    return isListID
 
 def list_identifiers__(line):
-    if (line[0][TOKEN] == ','):
-        line.remove(line[0])
-        if(line[0][CLASS] == 'IDENTIFICADOR'):
-            line.remove(line[0])
+    if (line[0][0][TOKEN] == ','):
+        line[0].remove(line[0][0])
+        if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+            line[0].remove(line[0][0])
             list_identifiers__(line)
-
+            return True
+    return False
 ###
 #   Checa se a linha eh uma atribuicao de variavel
 #   retorna true ou false
