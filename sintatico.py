@@ -28,7 +28,7 @@ def isProgramId(line):
 
                     var_declaration(line)
                     subprograms_declaration(line)
-                    # compost_command(line)
+                    composed_commands(line)
                     if (line[0][TOKEN] == '.'):
                         print('DEU BOM')
                         isProgId = True
@@ -71,15 +71,237 @@ def isVarDeclaration(line):
 #   Checa se a linha eh uma declaracao de subprogramas
 #   retorna true ou false
 ###
+def subprograms_declarations(line):
+    subprograms_declarations__(line)
+
+
 def subprograms_declarations__(line):
-        if (subprogram_declaration(line)):
-            if (line[0][TOKEN] == ';'):
-                line.remove(line[0])
-                subprograms_declarations__()
-            else:
-                sys.exit('1 - FALTOU ;')
+    if (subprogram_declaration(line)):
+        if (line[0][0][TOKEN] == ';'):
+            line.remove(line[0])
+            subprograms_declarations__(line)
         else:
-            pass    
+            sys.exit('1 - FALTOU ;')
+    else:
+        pass    
+
+def subprogram_declaration(line):
+    isSubDec = False
+    if(line[0][0][TOKEN] == 'procedure'):
+        line[0].remove(line[0][0])
+        if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+            line[0].remove(line[0][0])
+            arguments(line)
+            if(line[0][0][TOKEN] == ';'):
+                line.remove(line[0])
+                var_declaration(line) # pode ser assim ao invez do de cima!! EU ACHO
+
+                subprograms_declarations(line)
+                composed_commands(line)
+                isSubDec = True
+                return isSubDec
+            else:
+                sys.exit('2 - FALTOU ;')
+
+        else:
+            sys.exit('3 - FALTOU IDENTIFICADOR')
+
+def composed_commands(line):
+    if (line[0][0][TOKEN] == 'begin'):
+        line.remove(line[0])
+        options_commands(line)
+        if(line[0][0][TOKEN] == 'end'):
+            return True
+        else:
+            sys.exit('FALTANDO COMANDO end')
+    else:
+        return False
+
+def options_commands(line):
+    list_commands(line)
+
+def list_commands(line):
+    command(line)
+    list_commands__(line)
+
+def list_commands__(line):
+    if (line[0][0][TOKEN] == ';')
+        line.remove(line[0])
+        command(line)
+        list_commands__(line)
+
+def command(line):
+    if (line[0][0][CLASS] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        if(line[0][0][TOKEN] == ':='):
+            line[0].remove(line[0][0])
+            expression(line)
+            return
+        else:
+            sys.exit('15 - FALTOU :=')
+
+    elif: 
+        activation_procedure()
+        pass
+    elif composed_commands(line):
+        pass
+    else:
+        reserved = line[0][0][TOKEN]
+
+        if (reserved == 'if'):
+            line[0].remove(line[0][0])
+            expression(line)
+            if(line[0][0][TOKEN] == 'then'):
+                line[0].remove(line[0][0])
+                command(line)
+                else_part(line)
+                return
+            else:
+                sys.exit('FALTOU O then')
+        
+        elif (reserved == 'while'):
+            line[0].remove(line[0][0])
+            expression(line)
+            if(line[0][0][TOKEN] == 'do'):
+                line[0].remove(line[0][0])
+                command(line)
+                return
+            else:
+                sys.exit('FALTOU O do')
+
+        else:
+            return False
+
+
+def else_part(line):
+    if(line[0][0][TOKEN] == 'else'):
+        line.remove(line[0])
+        command(line)
+
+def activation_procedure(line):
+    if (line[0][0][TOKEN] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        if(line[0][0][TOKEN] == '('):
+            line[0].remove(line[0][0])
+            list_expressions(line)
+            if(line[0][0][TOKEN] == ')'):
+                line[0].remove(line[0][0])
+                return True
+            else:
+                sys.exit('FALTOU )')
+        else:
+            return True
+    else:
+        return False
+
+def list_expressions(line):
+    expression(line)
+    list_expressions__(line)
+
+def list_expressions__(line):
+    if(line[0][0][TOKEN] == ','):
+        line[0].remove(line[0][0])
+        expression(line)
+        list_expressions__(line)
+        
+
+def expression(line):
+    if (simple_expression(line)):
+        if(line[0][0][TOKEN] in relationalOperators):
+            line[0].remove(line[0][0])
+            simple_expression(line)
+    else:
+        sys.exit('ERROU EXPRESSAO')
+
+def simple_expression(line):
+    if (term(line)):
+        simple_expression__(line)
+        return True
+    elif (line[0][0][TOKEN] in numberSignals):
+        line[0].remove(line[0][0])
+        term(line)
+        simple_expression__(line)
+        return True
+    else:
+        return False
+
+def simple_expression__(line):
+    if (line[0][0][TOKEN] in addOperators):
+        line[0].remove(line[0][0])
+        term(line)
+        simple_expression__(line)
+
+def op_relational(line):
+    if (line[0][0][TOKEN] in relationalOperators):
+        line[0].remove(line[0][0])
+        return True
+    else:
+        return False
+
+def op_aditive(line):
+    if (line[0][0][TOKEN] in addOperators):
+        line[0].remove(line[0][0])
+        return True
+    else:
+        return False
+
+def op_multiplicative(line):
+    if (line[0][0][TOKEN] in multOperators):
+        line[0].remove(line[0][0])
+        return True
+    else:
+        return False
+    
+def term(line):
+    if (factor(line)):
+        term__(line)
+        return True
+    else:
+        return False
+
+def term__(line):
+    if(op_multiplicative):
+        factor(line)
+        term__(line)
+
+def factor(line):
+    if (line[0][0][TOKEN] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        if (line[0][0][TOKEN] == '('):
+            line[0].remove(line[0][0])
+            list_expressions(line)
+            if (line[0][0][TOKEN] == ')'):
+                line[0].remove(line[0][0])
+                return True
+            else:
+                sys.exit('FALTOU O )')
+        else:
+            return True
+
+    elif (line[0][0][CLASS] == 'INTEIRO') or (line[0][0][CLASS] == 'REAL'):
+        line[0].remove(line[0][0])
+        return True
+    elif (line[0][0][TOKEN] == 'true') or (line[0][0][TOKEN] == 'false'): 
+        line[0].remove(line[0][0])
+        return True
+    elif (line[0][0][TOKEN] == '('):
+        line[0].remove(line[0][0])
+        expression(line)
+        if (line[0][0][TOKEN] == ')'):
+            line[0].remove(line[0][0])
+            return True
+        else:
+            sys.exit('FALTOU O )')
+
+    elif (line[0][0][TOKEN] == 'not'):
+        line[0].remove(line[0][0])
+        factor(line)
+        return True
+
+
+
+
+
 
 def var_declaration(line):
     if(line[0][0][TOKEN] == 'var'):
@@ -104,7 +326,6 @@ def var_declaration_list(line):
     else:
         sys.exit('10 - ERROU IDENDIFICAR')
 
-
 def var_declaration_list__(line):
     if(list_identifiers(line)):
         if(line[0][0][TOKEN] == ':'):
@@ -123,61 +344,38 @@ def var_declaration_list__(line):
     else:
         var_declaration_list(line)
 
-
-def subprogram_declaration(line):
-    isSubDec = False
-    if(line[0][0][TOKEN] == 'procedure'):
-        line.remove(line[0])
-        if(line[0][0][CLASS] == 'IDENTIFICADOR'):
-            line.remove(line[0])
-            arguments(line)
-            if(line[0][0][TOKEN] == ';'):
-                line.remove(line[0])
-                if line[0][0][TOKEN] == 'var': 
-                    isVarDeclaration(line)
-                subprograms_declarations__(line)
-                composed_commands(line)
-                isSubDec = True
-                return isSubDec
-            else:
-                sys.exit('2 - FALTOU ;')
-
-        else:
-            sys.exit('3 - FALTOU IDENTIFICADOR')
-
 def arguments(line):
     if(line[0][0][TOKEN] == '('):
-        line.remove(line[0])
+        line[0].remove(line[0][0])
         list_parameters(line)
+        
         if(line[0][0][TOKEN] == ')'):
             line.remove(line[0])
+            pass
         else:
             sys.exit('4 - FALTOU ) ')
-    else:
-        sys.exit('5 - FALTOU (')
 
 def list_parameters(line):
     list_identifiers(line)
     if (line[0][0][TOKEN] == ':'):
-        line.remove(line[0])
+        line[0].remove(line[0][0])
         if(line[0][0][TOKEN] in variableTypes):
-            line.remove(line[0])
+            line[0].remove(line[0][0])
             list_parameters__(line)
         else:
             sys.exit('6 - ERROU O TIPO')
 
 def list_parameters__(line):
     if(line[0][0][TOKEN] == ';'):
-        line.remove(line[0])
+        line[0].remove(line[0][0])
         if (not list_identifiers(line)) :
             if (line[0][0][TOKEN] == ':'):
-                line.remove(line[0][0])
+                line[0].remove(line[0][0])
                 if(line[0][TOKEN] in variableTypes):
-                    line.remove(line[0])
+                    line[0].remove(line[0][0])
                     list_parameters__(line)
             else:
                 sys.exit('14 - ERRO SINTATICO :')
-
 
 def list_identifiers(line):
     isListID = False
