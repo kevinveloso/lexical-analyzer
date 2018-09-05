@@ -1,6 +1,7 @@
 # Alunos: Fernando Souza (11218354) e Kevin Veloso (11318626)
 
 import re
+import sys
 
 TOKEN = 0
 CLASS = 1
@@ -18,229 +19,361 @@ multOperators = ['*', '/', 'and']
 #   Checa se a linha eh um identificador do programa
 #   retorna true ou false
 ###
-def isProgramId(line):
-    isProgId = False
+def syntactic_analyzer(line):
     
-    if(line[0][TOKEN] == "program"):
-            if(line[1][CLASS] == "IDENTIFICADOR"):
-                if(line[2][TOKEN] == ";"):
-                    isProgId = True
-                    
-    return isProgId
-
-# ###
-# #   Checa se a token eh um fator
-# #   retorna true ou false
-# ###
-# def isFactor(token):
-#     isFactor = False
-
- 
-#     if token[0][CLASS] == 'IDENTIFICADOR':
-#         if token[1][TOKEN] == '(': 
-#             if not isExpressionList(token):
-#                 return False
-#         isFactor = True
-
-#     elif token[0][CLASS] == 'INTEGER' or token[0][CLASS] == 'REAL':
-#         isFactor = True
-
-#     elif token[0][TOKEN] == 'true' or token[0][TOKEN] == 'false':
-#         isFactor = True
-
-#     elif token[0][TOKEN] == '(':
-#         isFactor = isExpression(token)
-
-#     elif token[0][TOKEN] == 'not':
-#         token.remove(token[0])
-#         isFactor = isFactor(token)
-    
-#     return isFactor
-
-# ###
-# #   Checa se a token eh um termo
-# #   retorna true ou false
-# ###
-# def isTerm(token):
-#     isTerm = False
-
-#     if len(token) = 0:
-#         isTerm = True
-
-#     if isFactor(token[0]):
-#         token.remove(token[0])
-        
-#         if len(token) > 0:
-#             if token[0][TOKEN] in multOperators:
-#                 token.remove(token[0])
-                
-#                 if isFactor(token[0]) :
-#                     token.remove(token[0])
-
-#                     isTerm(token)
-#         else:
-#             isTerm = True
-
-#     return isTerm
-
-###
-#   Checa se a token eh uma exprecao simples
-#   retorna true ou false
-###
-# def isSimpleExpression(token):
-#     isSimpleExp = False
-
-#     if len(token) == 0:
-#         isSimpleExp = True
-#     elif token[0][TOKEN] in numberSignals:
-#         token.remove(token[0])
-
-#         if isTerm(token):
-#             token.remove(token[0])
-#             isSimpleExp = True
-#         if
-    
-
-#     return isSimpleExp
-###
-#   Checa se a linha eh uma declaracao de variavel
-#   retorna true ou false
-###
-def isVarDeclaration(line):
-    isVarDec = False 
-
-    if(line[0][CLASS] == 'IDENTIFICADOR'):  
-        if(line[1][TOKEN] == ':'):
-            if(line[2][TOKEN] in variableTypes):                      
-                if(line[3][TOKEN] == ';'):
-                    isVarDec = True
-
-        elif(line[1][TOKEN] == ','):
-            i = 2
-            while((line[i - 1][TOKEN] == ',') and (line[i][CLASS] == 'IDENTIFICADOR')):
-                if(line[i + 1][TOKEN] == ':'):
-                    if(line[i + 2][TOKEN] in variableTypes):                   
-                        if(line[i + 3][TOKEN] == ';'):
-                            isVarDec = True
-                            break
-                i += 2
-
-        if(isVarDec):
-            for token in line:
-                if(token[CLASS] == 'IDENTIFICADOR'):
-                    programVariables.append(token[TOKEN])
-
-    return isVarDec     
-
-###
-#   Checa se a linha eh uma atribuicao de variavel
-#   retorna true ou false
-###
-def isVariableAttr(line):
-    isVariableAttr = False
-
-    while line :
-
-        if line[0][CLASS] == 'IDENTIFICADOR':
-            if line[0][TOKEN] in programVariables:
-                line.remove(line[0])
-
-                if line[0][TOKEN] == ':=':
+    if(line[0][0][TOKEN] == "program"):
+            if(line[0][1][CLASS] == "IDENTIFICADOR"):
+                if(line[0][2][TOKEN] == ";"):
                     line.remove(line[0])
+                    var_declaration(line)
 
-                    if isExpression(line):
-                        isVariableAttr = True
-                        break
+                    if(line[0][0][TOKEN] == 'procedure'):
+                        subprograms_declarations(line)
+                    elif(line[0][0][TOKEN] == 'begin'):
+                        composed_commands(line)
 
-    return isVariableAttr
+                    if (line[0][0][TOKEN] == '.'):
+                        print('---PROGRAMA SINTATICAMENTE CORRETO---')                    
 
-###
-#   Checa se a linha eh uma expressao
-#   retorna true ou false
-###
-def isExpression(line, flag = True):
-    isExpression = False
-    parenthesisCount = list()
-    
-    while line :
+def subprograms_declarations(line):
+    subprograms_declarations__(line)
 
-      if (line[0][TOKEN] in numberSignals) and (flag):
+def subprograms_declarations__(line):
+    if (subprogram_declaration(line)):
+        if (line[0][0][TOKEN] == ';'):
             line.remove(line[0])
+            subprograms_declarations__(line)
+        elif(line[0][0][TOKEN] == '.'):
+            pass
+        else:
+            sys.exit('1 - ERRO SINTATICO: ; ESPERADO')
+    else:
+        pass    
 
-            if (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL'):
+def subprogram_declaration(line):
+    isSubDec = False
+    if(line[0][0][TOKEN] == 'procedure'):
+        line[0].remove(line[0][0])
+        if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+            line[0].remove(line[0][0])
+            arguments(line)
+            if(line[0][0][TOKEN] == ';'):
                 line.remove(line[0])
 
-                if (line[0][TOKEN] in relationalOperators) or (line[0][TOKEN] in addOperators) or (line[0][TOKEN] in multOperators):
-                    line.remove(line[0])
+                if(line[0][0][TOKEN] == 'var'):
+                    var_declaration(line)
+                if(line[0][0][TOKEN] == 'procedure'):
+                    subprograms_declarations(line)
+                if(line[0][0][TOKEN] == 'begin'):
+                    composed_commands(line)
 
-                    if isExpression(line, False):
-                        isExpression = True
-                        break
-
-                elif line[0][TOKEN] == ';' :
-                    isExpression = True
-                    break    
-
-        elif (line[0][TOKEN] == 'not') and (flag) :
-            line.remove(line[0])
-
-            if isExpression(line, False):
-                isExpression = True
-                break
-
-        elif ((line[0][TOKEN] == 'true') or (line[0][TOKEN] == 'false')) and (flag):
-            line.remove(line[0])
-
-            if line[0][TOKEN] == ';':
-                isExpression = True
-                break
-
-        elif (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL') or (line[0][TOKEN] in programVariables):
-            line.remove(line[0])
-
-            if (line[0][TOKEN] in relationalOperators) or (line[0][TOKEN] in addOperators) or (line[0][TOKEN] in multOperators):
-                line.remove(line[0])
-
-                if isExpression(line, False):
-                    isExpression = True
-                    break
-
-            elif line[0][TOKEN] == ';' :
-                isExpression = True 
-                break
-
-    #CONTROLE DE ABERTURA E FECHAMENTO DE PARENTESES
-    parCount = 0
-
-    for par in parenthesisCount :
-        if par == '(':
-            parCount += 1
-        elif par == ')':
-            parCount -=1
-    
-    if parCount is not 0:
-        isExpression = False
-            
-    return isExpression
-
-
-###
-#   Checa se a linha eh um comando
-#   retorna true ou false
-###
-def isCommand(line):
-    isCommand = False
-    
-    while line :
-
-        if token[CLASS] == 'IDENTIFICADOR':
-            if token[TOKEN] in programVariables:
-                isCommand = isVariableAttr(line)
+                return isSubDec
             else:
-                break
-        elif token[CLASS] == 'PALAVRARESERVADA':
-            True
-    return isCommand
+                sys.exit('2 - ERRO SINTATICO: ; ESPERADO')
+
+        else:
+            sys.exit('3 - ERRO SINTATICO: IDENTIFICADOR ESPERADO')
+
+def composed_commands(line):
+    if (line[0][0][TOKEN] == 'begin'):
+        line.remove(line[0])
+        options_commands(line)
+
+        if(line[0][0][TOKEN] == 'end'):
+            line[0].remove(line[0][0])
+
+            if (len(line[0]) == 0):
+                line.remove(line[0])
+            return True
+        else:
+            sys.exit('4 - ERRO SINTATICO: COMANDO end ESPERADO')
+    else:
+        return False
+
+def options_commands(line):
+    list_commands(line)
+
+def list_commands(line):
+    command(line)
+    list_commands__(line)
+
+def list_commands__(line):
+    if (line[0][0][TOKEN] == ';'):
+        line.remove(line[0])
+        command(line)
+        list_commands__(line)
+
+def command(line):
+    if (line[0][0][CLASS] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        if(line[0][0][TOKEN] == ':='):
+            line[0].remove(line[0][0])
+            expression(line)
+            return
+        else:
+            sys.exit('5 - ERRO SINTATICO: := ESPERADO')
+
+    elif activation_procedure(line): 
+        pass
+    elif composed_commands(line):
+        pass
+    else:
+        reserved = line[0][0][TOKEN]
+        #VER IF TIPO C
+        if (reserved == 'if'):
+            line[0].remove(line[0][0])
+            expression(line)
+            if(line[0][0][TOKEN] == 'then'):
+                line.remove(line[0])
+                command(line)
+                else_part(line)
+                return
+            else:
+                sys.exit('6 - ERRO SINTATICO: COMANDO then ESPERADO')
+        
+        elif (reserved == 'while'):
+            line[0].remove(line[0][0])
+            expression(line)
+            if(line[0][0][TOKEN] == 'do'):
+                line.remove(line[0])
+                command(line)
+                return
+            else:
+                sys.exit('7 - ERRO SINTATICO: COMANDO do ESPERADO')
+        #DO WHILE
+        # elif (reserved == 'do'):
+        #     line.remove(line[0])
+        #     command(line)
+
+        #     if(line[0][0][TOKEN] == ';'):
+        #         line.remove(line[0])
+
+        #     if (line[0][0][TOKEN] == 'while'):
+        #         line[0].remove(line[0][0])
+        #         expression(line)
+        #         return
+
+        else:
+            return False
+
+def else_part(line):
+    if(line[0][0][TOKEN] == 'else'):
+        line.remove(line[0])
+        command(line)
+
+def activation_procedure(line):
+    if (line[0][0][TOKEN] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        if(line[0][0][TOKEN] == '('):
+            line[0].remove(line[0][0])
+            list_expressions(line)
+            if(line[0][0][TOKEN] == ')'):
+                line[0].remove(line[0][0])
+                return True
+            else:
+                sys.exit('8 - ERRO SINTATICO: ) ESPERADO')
+        else:
+            return True
+    else:
+        return False
+
+def list_expressions(line):
+    expression(line)
+    list_expressions__(line)
+
+def list_expressions__(line):
+    if(line[0][0][TOKEN] == ','):
+        line[0].remove(line[0][0])
+        expression(line)
+        list_expressions__(line)        
+
+def expression(line):
+    if (simple_expression(line)):
+        if(line[0][0][TOKEN] in relationalOperators):
+            line[0].remove(line[0][0])
+            simple_expression(line)
+    else:
+        sys.exit('9 - ERRO SINTATICO: EXPRESSAO ESPERADO')
+
+def simple_expression(line):
+    if (term(line)):
+        simple_expression__(line)
+        return True
+    elif (line[0][0][TOKEN] in numberSignals):
+        line[0].remove(line[0][0])
+        term(line)
+        simple_expression__(line)
+        return True
+    else:
+        return False
+
+def simple_expression__(line):
+    if (line[0][0][TOKEN] in addOperators):
+        line[0].remove(line[0][0])
+        term(line)
+        simple_expression__(line)
+
+def op_relational(line):
+    if (line[0][0][TOKEN] in relationalOperators):
+        line[0].remove(line[0][0])
+        return True
+    else:
+        return False
+
+def op_aditive(line):
+    if (line[0][0][TOKEN] in addOperators):
+        line[0].remove(line[0][0])
+        return True
+    else:
+        return False
+
+def op_multiplicative(line):
+    if (line[0][0][TOKEN] in multOperators):
+        line[0].remove(line[0][0])
+        return True
+    else:
+        return False
+    
+def term(line):
+    if (factor(line)):
+        term__(line)
+        return True
+    else:
+        return False
+
+def term__(line):
+    if(op_multiplicative(line)):
+        factor(line)
+        term__(line)
+
+def factor(line):
+    if (line[0][0][CLASS] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        
+        if (line[0][0][TOKEN] == '('):
+            line[0].remove(line[0][0])
+            list_expressions(line)
+            if (line[0][0][TOKEN] == ')'):
+                line[0].remove(line[0][0])
+                return True
+            else:
+                sys.exit('10 - ERRO SINTATICO: ) ESPERADO')
+        else:
+            return True
+
+    elif (line[0][0][CLASS] == 'INTEIRO') or (line[0][0][CLASS] == 'REAL'):
+        line[0].remove(line[0][0])
+        return True
+    elif (line[0][0][TOKEN] == 'true') or (line[0][0][TOKEN] == 'false'): 
+        line[0].remove(line[0][0])
+        return True
+    elif (line[0][0][TOKEN] == '('):
+        line[0].remove(line[0][0])
+        expression(line)
+        if (line[0][0][TOKEN] == ')'):
+            line[0].remove(line[0][0])
+            return True
+        else:
+            sys.exit('11 - ERRO SINTATICO: ) ESPERADO')
+
+    elif (line[0][0][TOKEN] == 'not'):
+        line[0].remove(line[0][0])
+        factor(line)
+        return True
+
+def var_declaration(line):
+    if(line[0][0][TOKEN] == 'var'):
+        line.remove(line[0])
+        var_declaration_list(line)
+
+def var_declaration_list(line):
+    if(not list_identifiers(line)):
+        if(line[0][0][TOKEN] == ':'):
+            line[0].remove(line[0][0])
+            if(line[0][0][TOKEN] in variableTypes):
+                line[0].remove(line[0][0])
+                if(line[0][0][TOKEN] == ';'):
+                    line.remove(line[0])
+                    var_declaration_list__(line)
+                else:
+                    sys.exit('12 - ERRO SINTATICO: ; ESPERADO')
+            else:
+                sys.exit('13 - ERRO SINTATICO: TIPO INVALIDO')
+        elif (line[0][0][TOKEN] == 'procedure' or line[0][0][TOKEN] == 'begin'):
+            pass
+        else:
+            sys.exit('14 - ERRO SINTATICO: : ESPERADO')
+    else:
+        sys.exit('15 - ERRO SINTATICO: IDENTIFICADOR INVALIDO')
+
+def var_declaration_list__(line):
+    if(list_identifiers(line)):
+        if(line[0][0][TOKEN] == ':'):
+            line[0].remove(line[0][0])
+            if(line[0][0][TOKEN] in variableTypes):
+                line[0].remove(line[0][0])
+                if(line[0][0][TOKEN] == ';'):
+                    line.remove(line[0])
+                    var_declaration_list(line)
+                else:
+                    sys.exit('16 - ERRO SINTATICO: ; ESPERADO')
+            else:
+                sys.exit('17 - ERRO SINTATICO: TIPO INVALIDO')
+        else:
+            sys.exit('18 - ERRO SINTATICO: : ESPERADO')
+    else:
+        var_declaration_list(line)
+
+def arguments(line):
+    if(line[0][0][TOKEN] == '('):
+        line[0].remove(line[0][0])
+        list_parameters(line)
+        
+        if(line[0][0][TOKEN] == ')'):
+            line[0].remove(line[0][0])
+            pass
+        else:
+            sys.exit('19 - ERRO SINTATICO: ) ESPERADO')
+
+def list_parameters(line):
+    list_identifiers(line)
+    if (line[0][0][TOKEN] == ':'):
+        line[0].remove(line[0][0])
+        if(line[0][0][TOKEN] in variableTypes):
+            line[0].remove(line[0][0])
+            list_parameters__(line)
+        else:
+            sys.exit('20 - ERRO SINTATICO: TIPO INVALIDO')
+
+def list_parameters__(line):
+    if(line[0][0][TOKEN] == ';'):
+        line[0].remove(line[0][0])
+        if (not list_identifiers(line)) :
+            if (line[0][0][TOKEN] == ':'):
+                line[0].remove(line[0][0])
+                if(line[0][TOKEN] in variableTypes):
+                    line[0].remove(line[0][0])
+                    list_parameters__(line)
+            else:
+                sys.exit('21 - ERRO SINTATICO: : ESPERADO')
+
+def list_identifiers(line):
+    isListID = False
+    if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+        line[0].remove(line[0][0])
+        isListID = list_identifiers__(line)
+        
+    return isListID
+
+def list_identifiers__(line):
+    if (line[0][0][TOKEN] == ','):
+        line[0].remove(line[0][0])
+        if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+            line[0].remove(line[0][0])
+            list_identifiers__(line)
+            return True
+    return False
+
 
 ###
 #   ANALIZADOR SINTATICO
@@ -261,7 +394,6 @@ with open('./data/table.txt', 'r') as programTable:
    
     for line in lines:
         tokensList.append(re.split(r'\|',line))
-
     
     lastLine = '1'
     for line in tokensList: 
@@ -274,40 +406,7 @@ with open('./data/table.txt', 'r') as programTable:
             linesList = list() #ZERANDO LISTA
             linesList.append(line) #INICIANDO LISTA COM PRIMEIRA PALAVRA DA NOVA LINHA
             lastLine = line[2] #INCREMENTANDO O LASTLINE
+
     programLines.append(linesList) #FAZENDO FECHAMENTO DA ULTIMA LINHA
 
-#   Compilador deve comecar com program
-#   depois deve vir o identificador e em seguida
-#   simbolo ; para indicar o fim do programa
-
-
-    if(isProgramId(programLines[0])):
-        
-        programLines.remove(programLines[0])
-
-        if(programLines[0][0][TOKEN] == 'var'):
-
-            programLines.remove(programLines[0])
-         
-            while programLines: #CHECA PARA TODAS AS LINHAS SE VALEM COMO DEFINICAO DE TIPO DE VARIAVEL
-                if(isVarDeclaration(programLines[0])):
-                    programLines.remove(programLines[0])  
-                elif (programLines[0][0][TOKEN] == 'begin'):
-                    break
-                else:
-                    print('ERRO SINTATICO! TELA AZUL!')
-                    break
-        linesadad = [['valor1', 'IDENTIFICADOR', '7'], [':=', 'DELIMITADOR', '7'], ['10.3', 'REAL', '7'], [';','DELIMITADOR', '7']]
-        print(isVariableAttr(linesadad))
-    
-
-        # while programLines:
-        #     if(programLines[0][0][TOKEN] == 'begin'):
-        #         print('comecou com begin')
-        #         programLines.remove(programLines[0])    
-        #     break    
-
-                    
-
-        # if(token(lista,linha) == '.')
-        #     print("programa sem erros lexicos ou sintaticos")
+    syntactic_analyzer(programLines)
