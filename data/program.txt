@@ -1,9 +1,21 @@
 program test; {programa exemplo}
+
 var
     valor1: integer;
-    valor2,valor3,valor4: real;
-    valor5:real;
-    //42if:=teste;
+    //valor2,valor3,valor4: real;
+    //valor5:real;
+    //valor6:real;
+    //valor7,valor8,valor9: real;
+
+procedure test2;
+
+procedure test3(x: real);
+    var
+        valor10: integer;
+    begin
+        valor10 := 15.5;
+    end
+
 begin
     valor1 := 10.3;
 end.

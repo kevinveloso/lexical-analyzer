@@ -1,6 +1,7 @@
 # Alunos: Fernando Souza (11218354) e Kevin Veloso (11318626)
 
 import re
+import sys
 
 TOKEN = 0
 CLASS = 1
@@ -25,47 +26,18 @@ def isProgramId(line):
             if(line[0][1][CLASS] == "IDENTIFICADOR"):
                 if(line[0][2][TOKEN] == ";"):
                     line.remove(line[0])
-
                     var_declaration(line)
-                    subprograms_declaration(line)
-                    composed_commands(line)
-                    if (line[0][TOKEN] == '.'):
+
+                    if(line[0][0][TOKEN] == 'procedure'):
+                        subprograms_declarations(line)
+                    elif(line[0][0][TOKEN] == 'begin'):
+                        composed_commands(line)
+
+                    if (line[0][0][TOKEN] == '.'):
                         print('DEU BOM')
                         isProgId = True
                     
     return isProgId
-
-###
-#   Checa se a linha eh uma declaracao de variavel
-#   retorna true ou false
-###
-def isVarDeclaration(line):
-    isVarDec = False 
-    
-    programLines.remove(programLines[0])
-
-    if(line[0][CLASS] == 'IDENTIFICADOR'):  
-        if(line[1][TOKEN] == ':'):
-            if(line[2][TOKEN] in variableTypes):                      
-                if(line[3][TOKEN] == ';'):
-                    isVarDec = True
-
-        elif(line[1][TOKEN] == ','):
-            i = 2
-            while((line[i - 1][TOKEN] == ',') and (line[i][CLASS] == 'IDENTIFICADOR')):
-                if(line[i + 1][TOKEN] == ':'):
-                    if(line[i + 2][TOKEN] in variableTypes):                   
-                        if(line[i + 3][TOKEN] == ';'):
-                            isVarDec = True
-                            break
-                i += 2
-
-        if(isVarDec):
-            for token in line:
-                if(token[CLASS] == 'IDENTIFICADOR'):
-                    programVariables.append(token[TOKEN])
-
-    return isVarDec     
 
 ###
 #   Checa se a linha eh uma declaracao de subprogramas
@@ -80,6 +52,8 @@ def subprograms_declarations__(line):
         if (line[0][0][TOKEN] == ';'):
             line.remove(line[0])
             subprograms_declarations__(line)
+        elif(line[0][0][TOKEN] == '.'):
+            pass
         else:
             sys.exit('1 - FALTOU ;')
     else:
@@ -94,11 +68,14 @@ def subprogram_declaration(line):
             arguments(line)
             if(line[0][0][TOKEN] == ';'):
                 line.remove(line[0])
-                var_declaration(line) # pode ser assim ao invez do de cima!! EU ACHO
 
-                subprograms_declarations(line)
-                composed_commands(line)
-                isSubDec = True
+                if(line[0][0][TOKEN] == 'var'):
+                    var_declaration(line)
+                if(line[0][0][TOKEN] == 'procedure'):
+                    subprograms_declarations(line)
+                if(line[0][0][TOKEN] == 'begin'):
+                    composed_commands(line)
+
                 return isSubDec
             else:
                 sys.exit('2 - FALTOU ;')
@@ -110,7 +87,12 @@ def composed_commands(line):
     if (line[0][0][TOKEN] == 'begin'):
         line.remove(line[0])
         options_commands(line)
+
         if(line[0][0][TOKEN] == 'end'):
+            line[0].remove(line[0][0])
+
+            if (len(line[0]) == 0):
+                line.remove(line[0])
             return True
         else:
             sys.exit('FALTANDO COMANDO end')
@@ -125,7 +107,7 @@ def list_commands(line):
     list_commands__(line)
 
 def list_commands__(line):
-    if (line[0][0][TOKEN] == ';')
+    if (line[0][0][TOKEN] == ';'):
         line.remove(line[0])
         command(line)
         list_commands__(line)
@@ -140,8 +122,7 @@ def command(line):
         else:
             sys.exit('15 - FALTOU :=')
 
-    elif: 
-        activation_procedure()
+    elif activation_procedure(line): 
         pass
     elif composed_commands(line):
         pass
@@ -260,13 +241,14 @@ def term(line):
         return False
 
 def term__(line):
-    if(op_multiplicative):
+    if(op_multiplicative(line)):
         factor(line)
         term__(line)
 
 def factor(line):
     if (line[0][0][TOKEN] == 'IDENTIFICADOR'):
         line[0].remove(line[0][0])
+        
         if (line[0][0][TOKEN] == '('):
             line[0].remove(line[0][0])
             list_expressions(line)
@@ -321,6 +303,8 @@ def var_declaration_list(line):
                     sys.exit('7 - FALTOU ;')
             else:
                 sys.exit('8 - ERROU O TIPO')
+        elif (line[0][0][TOKEN] == 'procedure' or line[0][0][TOKEN] == 'begin'):
+            pass
         else:
             sys.exit('9 - FALTOU :')
     else:
@@ -350,7 +334,7 @@ def arguments(line):
         list_parameters(line)
         
         if(line[0][0][TOKEN] == ')'):
-            line.remove(line[0])
+            line[0].remove(line[0][0])
             pass
         else:
             sys.exit('4 - FALTOU ) ')
@@ -393,95 +377,7 @@ def list_identifiers__(line):
             list_identifiers__(line)
             return True
     return False
-###
-#   Checa se a linha eh uma atribuicao de variavel
-#   retorna true ou false
-###
-def isVariableAttr(line):
-    isVariableAttr = False
 
-    while line :
-
-        if line[0][CLASS] == 'IDENTIFICADOR':
-            if line[0][TOKEN] in programVariables:
-                line.remove(line[0])
-
-                if line[0][TOKEN] == ':=':
-                    line.remove(line[0])
-
-                    if isExpression(line[0]):
-                        isVaribleAttr = True
-
-    return isVariableAttr
-
-###
-#   Checa se a linha eh uma expressao
-#   retorna true ou false
-###
-def isExpression(line, flag = True):
-    isExpression = False
-
-    while line :
-
-        if (line[0][TOKEN] in numberSignals) and (flag):
-            line.remove(line[0])
-
-            if (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL'):
-                line.remove(line[0])
-
-                if (line[0][TOKEN] in relationalOperators) or (line[0][TOKEN] in addOperators) or (line[0][TOKEN] in multOperators):
-                    line.remove(line[0])
-
-                    if isExpression(line, False):
-                        isExpression = True
-
-                elif line[0][TOKEN] == ';' :
-                    isExpression = True    
-
-        elif (line[0][TOKEN] == 'not') and (flag) :
-            line.remove(line[0])
-
-            if isExpression(line, False):
-                isExpression = True
-
-        elif ((line[0][TOKEN] == 'true') or (line[0][TOKEN] == 'false')) and (flag):
-            line.remove(line[0])
-
-            if line[0][TOKEN] == ';':
-                isExpression = True
-
-        elif (line[0][CLASS] == 'INTEGER') or (line[0][CLASS] == 'REAL') or (line[0][TOKEN] in programVariables):
-            line.remove(line[0])
-
-            if (line[0][TOKEN] in relationalOperators) or (line[0][TOKEN] in addOperators) or (line[0][TOKEN] in multOperators):
-                line.remove(line[0])
-
-                if isExpression(line, False):
-                    isExpression = True
-
-            elif line[0][TOKEN] == ';' :
-                isExpression = True 
-        
-            
-    return isExpression
-
-
-###
-#   Checa se a linha eh um comando
-#   retorna true ou false
-###
-def isCommand(line):
-    isCommand = False
-    
-    while line :
-
-        if token[CLASS] == 'IDENTIFICADOR':
-            if token[TOKEN] in programVariables:
-                isCommand = isVariableAttr(line)
-            else:
-                break
-        elif token[CLASS] == 'PALAVRARESERVADA':
-            True
 
 ###
 #   ANALIZADOR SINTATICO
@@ -521,7 +417,6 @@ with open('./data/table.txt', 'r') as programTable:
 #   depois deve vir o identificador e em seguida
 #   simbolo ; para indicar o fim do programa
 
-    print(programLines)
     if(isProgramId(programLines)):
         print('a')
         # programLines.remove(programLines[0])
