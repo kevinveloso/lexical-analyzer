@@ -128,12 +128,12 @@ def command(line):
         pass
     else:
         reserved = line[0][0][TOKEN]
-
+        #VER IF TIPO C
         if (reserved == 'if'):
             line[0].remove(line[0][0])
             expression(line)
             if(line[0][0][TOKEN] == 'then'):
-                line[0].remove(line[0][0])
+                line.remove(line[0])
                 command(line)
                 else_part(line)
                 return
@@ -144,11 +144,19 @@ def command(line):
             line[0].remove(line[0][0])
             expression(line)
             if(line[0][0][TOKEN] == 'do'):
-                line[0].remove(line[0][0])
+                line.remove(line[0])
                 command(line)
                 return
             else:
                 sys.exit('FALTOU O do')
+        #DO WHILE
+        elif (reserved == 'do'):
+            line.remove(line[0])
+            command(line)
+            if (line[0][0][TOKEN] == 'while'):
+                line[0].remove(line[0][0])
+                expression(line)
+                return
 
         else:
             return False
@@ -246,7 +254,7 @@ def term__(line):
         term__(line)
 
 def factor(line):
-    if (line[0][0][TOKEN] == 'IDENTIFICADOR'):
+    if (line[0][0][CLASS] == 'IDENTIFICADOR'):
         line[0].remove(line[0][0])
         
         if (line[0][0][TOKEN] == '('):
@@ -419,27 +427,3 @@ with open('./data/table.txt', 'r') as programTable:
 
     if(isProgramId(programLines)):
         print('a')
-        # programLines.remove(programLines[0])
-
-        # if(programLines[0][0][TOKEN] == 'var'):
-        #     var_declaration(programLines)
-
-        #     while programLines: #CHECA PARA TODAS AS LINHAS SE VALEM COMO DEFINICAO DE TIPO DE VARIAVEL
-        #         if(isVarDeclaration(programLines[0])):
-        #             programLines.remove(programLines[0])  
-        #         elif (programLines[0][0][TOKEN] == 'begin'):
-        #             break
-        #         else:
-        #             print('ERRO SINTATICO! TELA AZUL!')
-        #             break
-
-        # while programLines:
-        #     if(programLines[0][0][TOKEN] == 'begin'):
-        #         print('comecou com begin')
-        #         programLines.remove(programLines[0])
-        #         print(programLines)    
-        #     break    
-                    
-
-        # if(token(lista,linha) == '.')
-        #     print("programa sem erros lexicos ou sintaticos")

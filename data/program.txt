@@ -18,4 +18,11 @@ procedure test3(x: real);
 
 begin
     valor1 := 10.3;
+    if (valor3 = 3) then
+        valor5 := valor4 * 3;
+    while (valor7 <> valor3) do
+        valor1 := 10.5 + valor7;
+    do
+        valor1 := 10.5 + valor7;
+    while (valor7 <> valor3);
 end.
