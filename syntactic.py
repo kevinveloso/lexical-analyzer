@@ -8,16 +8,21 @@ CLASS = 1
 LINE_NUMBER = 2
 
 variableTypes = ['integer', 'real', 'boolean'] 
-programVariables = list()
 
 numberSignals = ['-', '+']
 relationalOperators = ['=', '<', '>', '<=', '>=', '<>']
 addOperators = ['+', '-', 'or']
 multOperators = ['*', '/', 'and']
 
-variableTypes = list() #Semantico
+intVarList = list() #Semantico
+realVarList = list() #Semantico
+booleanVarList = list() #Semantico
+
+tempVarList = list() #Semantico
+
 tableList = list() #Semantico
 usageVerifier = 0 #Semantico
+typeVerifier = ''
 
 ###
 #   Checa se a linha eh um identificador do programa
@@ -130,6 +135,7 @@ def command(line):
     
             sys.exit('2 - ERRO SEMANTICO: VARIAVEL NAO DECLARADA')  
 
+        typeVerifier = check_type(line[0][0][TOKEN])
         ############ /SEMANTICO #############
 
         line[0].remove(line[0][0])
@@ -274,7 +280,26 @@ def term__(line):
         term__(line)
 
 def factor(line):
+
+
     if (line[0][0][CLASS] == 'IDENTIFICADOR'):
+        
+    ############ SEMANTICO #############
+        typeCheck = typeVerifier
+        type_check(line[0][0][TOKEN])
+
+        if typeCheck == 'integer':
+            if typeVerifier == 'boolean':
+                sys.exit('3 - ERRO SEMANTICO: ERRO DE TIPO') 
+        elif typeCheck == 'real':
+            if typeVerifier == 'integer' or typeVerifier == 'boolean': 
+                sys.exit('4 - ERRO SEMANTICO: ERRO DE TIPO') 
+        elif typeCheck == 'boolean':
+            if typeVerifier == 'integer' or typeVerifier == 'real': 
+                sys.exit('5 - ERRO SEMANTICO: ERRO DE TIPO') 
+    
+    ############ /SEMANTICO #############
+
         line[0].remove(line[0][0])
         
         if (line[0][0][TOKEN] == '('):
@@ -291,9 +316,11 @@ def factor(line):
     elif (line[0][0][CLASS] == 'INTEIRO') or (line[0][0][CLASS] == 'REAL'):
         line[0].remove(line[0][0])
         return True
+        
     elif (line[0][0][TOKEN] == 'true') or (line[0][0][TOKEN] == 'false'): 
         line[0].remove(line[0][0])
         return True
+
     elif (line[0][0][TOKEN] == '('):
         line[0].remove(line[0][0])
         expression(line)
@@ -318,6 +345,9 @@ def var_declaration_list(line):
         if(line[0][0][TOKEN] == ':'):
             line[0].remove(line[0][0])
             if(line[0][0][TOKEN] in variableTypes):
+                
+                add_in_type(line[0][0][TOKEN]) #Semantico
+                
                 line[0].remove(line[0][0])
                 if(line[0][0][TOKEN] == ';'):
                     line.remove(line[0])
@@ -338,6 +368,9 @@ def var_declaration_list__(line):
         if(line[0][0][TOKEN] == ':'):
             line[0].remove(line[0][0])
             if(line[0][0][TOKEN] in variableTypes):
+
+                add_in_type(line[0][0][TOKEN]) #Semantico
+
                 line[0].remove(line[0][0])
                 if(line[0][0][TOKEN] == ';'):
                     line.remove(line[0])
@@ -367,6 +400,7 @@ def list_parameters(line):
     if (line[0][0][TOKEN] == ':'):
         line[0].remove(line[0][0])
         if(line[0][0][TOKEN] in variableTypes):
+            add_in_type(line[0][0][TOKEN]) #Semantico
             line[0].remove(line[0][0])
             list_parameters__(line)
         else:
@@ -379,6 +413,7 @@ def list_parameters__(line):
             if (line[0][0][TOKEN] == ':'):
                 line[0].remove(line[0][0])
                 if(line[0][TOKEN] in variableTypes):
+                    add_in_type(line[0][0][TOKEN]) #Semantico
                     line[0].remove(line[0][0])
                     list_parameters__(line)
             else:
@@ -423,11 +458,44 @@ def check_in_scope(identifier):
         index -= 1 
     
     if not inTableList: 
-        tableList.append(identifier) 
+        tableList.append(identifier)
+        tempVarList.append(identifier)
+
     else:
         sys.exit('1 - ERRO SEMANTICO: IDENTIFICADOR JA DECLARADO')
-############ /SEMANTICO #############
 
+
+def add_in_type(token):
+    # print('vai printar')
+    # print(tempVarList)
+    # index = 0
+    if token == 'integer' :
+        for var in tempVarList:                        
+            intVarList.append(var)
+    elif token == 'real' :
+        for var in tempVarList:                        
+            realVarList.append(var)
+    elif token == 'boolean' :
+        for var in tempVarList:                        
+            booleanVarList.append(var)     
+    else:
+        sys.exit('2 - ERRO SEMANTICO: TIPO DE VARIAVEL NAO EXISTENTE')
+
+    del tempVarList[:]
+
+def check_type(identyfier):
+    if identyfier in intVarList :
+        typeVerifier = 'integer'
+    elif identyfier in realVarList :
+        typeVerifier = 'real'
+    elif identyfier in booleanVarList :
+        typeVerifier = 'boolean'
+    else:
+        sys.exit('3 - ERRO SEMANTICO: TIPO DE VARIAVEL NAO EXISTENTE')
+    
+    return typeVerifier
+
+############ /SEMANTICO #############
 
 ###
 #   ANALIZADOR SINTATICO
@@ -465,3 +533,7 @@ with open('./data/table.txt', 'r') as programTable:
 
     syntactic_analyzer(programLines)
     print(tableList)
+    print(tempVarList)
+    print(intVarList)
+    print(realVarList)
+    print(booleanVarList)
