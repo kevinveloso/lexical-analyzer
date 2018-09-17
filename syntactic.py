@@ -29,7 +29,7 @@ def syntactic_analyzer(line):
 
                     if(line[0][0][TOKEN] == 'procedure'):
                         subprograms_declarations(line)
-                    elif(line[0][0][TOKEN] == 'begin'):
+                    if(line[0][0][TOKEN] == 'begin'):
                         composed_commands(line)
 
                     if (line[0][0][TOKEN] == '.'):
@@ -119,7 +119,7 @@ def command(line):
         pass
     else:
         reserved = line[0][0][TOKEN]
-        #VER IF TIPO C
+
         if (reserved == 'if'):
             line[0].remove(line[0][0])
             expression(line)
@@ -141,17 +141,17 @@ def command(line):
             else:
                 sys.exit('7 - ERRO SINTATICO: COMANDO do ESPERADO')
         #DO WHILE
-        # elif (reserved == 'do'):
-        #     line.remove(line[0])
-        #     command(line)
+        elif (reserved == 'do'):
+            line.remove(line[0])
+            command(line)
 
-        #     if(line[0][0][TOKEN] == ';'):
-        #         line.remove(line[0])
+            if(line[0][0][TOKEN] == ';'):
+                line.remove(line[0])
 
-        #     if (line[0][0][TOKEN] == 'while'):
-        #         line[0].remove(line[0][0])
-        #         expression(line)
-        #         return
+            if (line[0][0][TOKEN] == 'while'):
+                line[0].remove(line[0][0])
+                expression(line)
+                return
 
         else:
             return False

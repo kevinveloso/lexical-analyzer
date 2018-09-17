@@ -1,28 +1,15 @@
-program test; {programa exemplo}
-
+program teste;
 var
-    valor1: integer;
-    //valor2,valor3,valor4: real;
-    //valor5:real;
-    //valor6:real;
-    //valor7,valor8,valor9: real;
+    x: real;
 
-procedure test2;
-
-procedure test3(x: real);
-    var
-        valor10: integer;
-    begin
-        valor10 := 15.5;
-    end
-
+procedure limpar(y:integer);
+var
+    z:boolean;
 begin
-    valor1 := 10.3;
-    if (valor3 = 3) then
-        valor5 := valor4 * 3;
-    while (valor7 <> valor3) do
-        valor1 := 10.5 + valor7;
-    //do
-       //valor1 := 10.5 + valor7;
-    //while (valor7 <> valor3);}
+    y:=z;
+end
+begin
+    do
+        x:=3;
+    while (x<10);
 end.
