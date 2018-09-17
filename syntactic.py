@@ -15,6 +15,10 @@ relationalOperators = ['=', '<', '>', '<=', '>=', '<>']
 addOperators = ['+', '-', 'or']
 multOperators = ['*', '/', 'and']
 
+variableTypes = list() #Semantico
+tableList = list() #Semantico
+usageVerifier = 0 #Semantico
+
 ###
 #   Checa se a linha eh um identificador do programa
 #   retorna true ou false
@@ -22,18 +26,22 @@ multOperators = ['*', '/', 'and']
 def syntactic_analyzer(line):
     
     if(line[0][0][TOKEN] == "program"):
-            if(line[0][1][CLASS] == "IDENTIFICADOR"):
-                if(line[0][2][TOKEN] == ";"):
-                    line.remove(line[0])
-                    var_declaration(line)
+        tableList.append('$')  #Semantico
+        
+        if(line[0][1][CLASS] == "IDENTIFICADOR"):
+            tableList.append(line[0][1][TOKEN]) #Semantico
 
-                    if(line[0][0][TOKEN] == 'procedure'):
-                        subprograms_declarations(line)
-                    if(line[0][0][TOKEN] == 'begin'):
-                        composed_commands(line)
+            if(line[0][2][TOKEN] == ";"):
+                line.remove(line[0])
+                var_declaration(line)
 
-                    if (line[0][0][TOKEN] == '.'):
-                        print('---PROGRAMA SINTATICAMENTE CORRETO---')                    
+                if(line[0][0][TOKEN] == 'procedure'):
+                    subprograms_declarations(line)
+                if(line[0][0][TOKEN] == 'begin'):
+                    composed_commands(line)
+
+                if (line[0][0][TOKEN] == '.'):
+                    print('---PROGRAMA SINTATICAMENTE CORRETO---')                    
 
 def subprograms_declarations(line):
     subprograms_declarations__(line)
@@ -55,6 +63,9 @@ def subprogram_declaration(line):
     if(line[0][0][TOKEN] == 'procedure'):
         line[0].remove(line[0][0])
         if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+            tableList.append(line[0][0][TOKEN]) #Semantico
+            tableList.append('$') #Semantico
+            
             line[0].remove(line[0][0])
             arguments(line)
             if(line[0][0][TOKEN] == ';'):
@@ -76,10 +87,12 @@ def subprogram_declaration(line):
 
 def composed_commands(line):
     if (line[0][0][TOKEN] == 'begin'):
+        # usageVerifier += 1 #Semantico
         line.remove(line[0])
         options_commands(line)
 
         if(line[0][0][TOKEN] == 'end'):
+            # usageVerifier -= 1 #Semantico
             line[0].remove(line[0][0])
 
             if (len(line[0]) == 0):
@@ -105,6 +118,20 @@ def list_commands__(line):
 
 def command(line):
     if (line[0][0][CLASS] == 'IDENTIFICADOR'):
+
+        ############ SEMANTICO #############
+
+        if line[0][0][TOKEN] not in tableList : 
+            
+            index = len(tableList) - 1
+            while tableList[index] != '$': 
+                del tableList[index]
+                index -= 1 
+    
+            sys.exit('2 - ERRO SEMANTICO: VARIAVEL NAO DECLARADA')  
+
+        ############ /SEMANTICO #############
+
         line[0].remove(line[0][0])
         if(line[0][0][TOKEN] == ':='):
             line[0].remove(line[0][0])
@@ -360,6 +387,9 @@ def list_parameters__(line):
 def list_identifiers(line):
     isListID = False
     if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+    
+        check_in_scope(line[0][0][TOKEN]) #Semantico
+
         line[0].remove(line[0][0])
         isListID = list_identifiers__(line)
         
@@ -369,10 +399,34 @@ def list_identifiers__(line):
     if (line[0][0][TOKEN] == ','):
         line[0].remove(line[0][0])
         if(line[0][0][CLASS] == 'IDENTIFICADOR'):
+            
+            check_in_scope(line[0][0][TOKEN]) #Semantico
+
             line[0].remove(line[0][0])
             list_identifiers__(line)
             return True
     return False
+
+
+############ SEMANTICO #############
+
+###
+# Chegagem se o identificador esta no escopo
+###
+
+def check_in_scope(identifier):
+    index = len(tableList) - 1 
+    inTableList = False 
+    while tableList[index] != '$': 
+        if tableList[index] == identifier : 
+            inTableList = True 
+        index -= 1 
+    
+    if not inTableList: 
+        tableList.append(identifier) 
+    else:
+        sys.exit('1 - ERRO SEMANTICO: IDENTIFICADOR JA DECLARADO')
+############ /SEMANTICO #############
 
 
 ###
@@ -410,3 +464,4 @@ with open('./data/table.txt', 'r') as programTable:
     programLines.append(linesList) #FAZENDO FECHAMENTO DA ULTIMA LINHA
 
     syntactic_analyzer(programLines)
+    print(tableList)
