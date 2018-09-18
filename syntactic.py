@@ -263,20 +263,6 @@ def simple_expression__(line):
         term(line)
         simple_expression__(line)
 
-def op_relational(line):
-    if (line[0][0][TOKEN] in relationalOperators):
-        line[0].remove(line[0][0])
-        return True
-    else:
-        return False
-
-def op_aditive(line):
-    if (line[0][0][TOKEN] in addOperators):
-        line[0].remove(line[0][0])
-        return True
-    else:
-        return False
-
 def op_multiplicative(line):
     if (line[0][0][TOKEN] in multOperators):
     ############ SEMANTICO #############
