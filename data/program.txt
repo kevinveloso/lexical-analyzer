@@ -5,7 +5,7 @@ procedure limpar(y:integer);
 var
     z:boolean;
 begin
-    y:=z;
+    x:=y+3.0+x+z;
 end
 begin
 

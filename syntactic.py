@@ -22,7 +22,6 @@ tempVarList = list() #Semantico
 
 tableList = list() #Semantico
 usageVerifier = 0 #Semantico
-typeVerifier = ''
 
 ###
 #   Checa se a linha eh um identificador do programa
@@ -135,7 +134,9 @@ def command(line):
     
             sys.exit('2 - ERRO SEMANTICO: VARIAVEL NAO DECLARADA')  
 
+        global typeVerifier
         typeVerifier = check_type(line[0][0][TOKEN])
+
         ############ /SEMANTICO #############
 
         line[0].remove(line[0][0])
@@ -285,18 +286,17 @@ def factor(line):
     if (line[0][0][CLASS] == 'IDENTIFICADOR'):
         
     ############ SEMANTICO #############
-        typeCheck = typeVerifier
-        type_check(line[0][0][TOKEN])
+        typeCheck = check_type(line[0][0][TOKEN])
 
         if typeCheck == 'integer':
             if typeVerifier == 'boolean':
-                sys.exit('3 - ERRO SEMANTICO: ERRO DE TIPO') 
+                sys.exit('4 - ERRO SEMANTICO: ERRO DE TIPO') 
         elif typeCheck == 'real':
             if typeVerifier == 'integer' or typeVerifier == 'boolean': 
-                sys.exit('4 - ERRO SEMANTICO: ERRO DE TIPO') 
+                sys.exit('5 - ERRO SEMANTICO: ERRO DE TIPO') 
         elif typeCheck == 'boolean':
             if typeVerifier == 'integer' or typeVerifier == 'real': 
-                sys.exit('5 - ERRO SEMANTICO: ERRO DE TIPO') 
+                sys.exit('6 - ERRO SEMANTICO: ERRO DE TIPO') 
     
     ############ /SEMANTICO #############
 
@@ -483,17 +483,18 @@ def add_in_type(token):
 
     del tempVarList[:]
 
-def check_type(identyfier):
-    if identyfier in intVarList :
-        typeVerifier = 'integer'
-    elif identyfier in realVarList :
-        typeVerifier = 'real'
-    elif identyfier in booleanVarList :
-        typeVerifier = 'boolean'
+def check_type(identifier):
+    varType = ''
+    if identifier in intVarList :
+        varType = 'integer'
+    elif identifier in realVarList :
+        varType = 'real'
+    elif identifier in booleanVarList :
+        varType = 'boolean'
     else:
-        sys.exit('3 - ERRO SEMANTICO: TIPO DE VARIAVEL NAO EXISTENTE')
+        sys.exit('3 - ERRO SEMANTICO: TIPO DE OPERADOR INESPERADO')
     
-    return typeVerifier
+    return varType
 
 ############ /SEMANTICO #############
 
