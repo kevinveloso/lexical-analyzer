@@ -313,11 +313,25 @@ def factor(line):
         else:
             return True
 
-    elif (line[0][0][CLASS] == 'INTEIRO') or (line[0][0][CLASS] == 'REAL'):
+    elif (line[0][0][CLASS] == 'INTEIRO'):
         line[0].remove(line[0][0])
         return True
         
-    elif (line[0][0][TOKEN] == 'true') or (line[0][0][TOKEN] == 'false'): 
+    elif (line[0][0][CLASS] == 'REAL'):
+
+    ############ SEMANTICO #############
+        if typeVerifier == 'integer': 
+            sys.exit('7 - ERRO SEMANTICO: ERRO DE TIPO') 
+    ############ /SEMANTICO #############
+        line[0].remove(line[0][0])
+        return True
+        
+    elif (line[0][0][TOKEN] == 'true') or (line[0][0][TOKEN] == 'false'):
+    ############ SEMANTICO #############
+        if typeVerifier == 'integer' or typeVerifier == 'real': 
+            sys.exit('8 - ERRO SEMANTICO: ERRO DE TIPO') 
+    ############ /SEMANTICO ############# 
+
         line[0].remove(line[0][0])
         return True
 

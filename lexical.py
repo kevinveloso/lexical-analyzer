@@ -54,6 +54,8 @@ try:
             else:
                 if re.match(r'((program)|(var)|(integer)|(real)|(boolean)|(procedure)|(begin)|(end)|(if)|(then)|(else)|(while)|(do)|(not))', temp):
                     table.write(str(temp) + ' | ' + 'PALAVRA RESERVADA' + ' | ' + str(count) + '\n' )
+                elif re.match(r'((true)|(false))', temp):
+                    table.write(str(temp) + ' | ' + 'BOOLEAN' + ' | ' + str(count) + '\n' )
                 elif re.match(r'([0-9]+\.[0-9]*)', temp):
                     table.write(str(temp) + ' | ' + 'REAL' + ' | ' + str(count) + '\n' )
                 elif re.match(r'[0-9]+', temp):
