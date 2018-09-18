@@ -23,6 +23,8 @@ tempVarList = list() #Semantico
 tableList = list() #Semantico
 usageVerifier = 0 #Semantico
 
+relationalOperation = False #Semantico
+
 ###
 #   Checa se a linha eh um identificador do programa
 #   retorna true ou false
@@ -36,6 +38,7 @@ def syntactic_analyzer(line):
             tableList.append(line[0][1][TOKEN]) #Semantico
 
             if(line[0][2][TOKEN] == ";"):
+                typeVerifier = '' #Semantico
                 line.remove(line[0])
                 var_declaration(line)
 
@@ -45,7 +48,7 @@ def syntactic_analyzer(line):
                     composed_commands(line)
 
                 if (line[0][0][TOKEN] == '.'):
-                    print('---PROGRAMA SINTATICAMENTE CORRETO---')                    
+                    print('---PROGRAMA CORRETO---')                    
 
 def subprograms_declarations(line):
     subprograms_declarations__(line)
@@ -53,6 +56,7 @@ def subprograms_declarations(line):
 def subprograms_declarations__(line):
     if (subprogram_declaration(line)):
         if (line[0][0][TOKEN] == ';'):
+            typeVerifier = '' #Semantico
             line.remove(line[0])
             subprograms_declarations__(line)
         elif(line[0][0][TOKEN] == '.'):
@@ -73,6 +77,7 @@ def subprogram_declaration(line):
             line[0].remove(line[0][0])
             arguments(line)
             if(line[0][0][TOKEN] == ';'):
+                typeVerifier = '' #Semantico
                 line.remove(line[0])
 
                 if(line[0][0][TOKEN] == 'var'):
@@ -116,6 +121,7 @@ def list_commands(line):
 
 def list_commands__(line):
     if (line[0][0][TOKEN] == ';'):
+        typeVerifier = '' #Semantico
         line.remove(line[0])
         command(line)
         list_commands__(line)
@@ -180,6 +186,7 @@ def command(line):
             command(line)
 
             if(line[0][0][TOKEN] == ';'):
+                typeVerifier = '' #Semantico
                 line.remove(line[0])
 
             if (line[0][0][TOKEN] == 'while'):
@@ -224,6 +231,11 @@ def list_expressions__(line):
 def expression(line):
     if (simple_expression(line)):
         if(line[0][0][TOKEN] in relationalOperators):
+        ############ SEMANTICO #############
+            if typeVerifier == 'integer' or typeVerifier == 'real': 
+                sys.exit('9 - ERRO SEMANTICO: ERRO DE TIPO') 
+        ############ /SEMANTICO #############
+        
             line[0].remove(line[0][0])
             simple_expression(line)
     else:
@@ -243,6 +255,10 @@ def simple_expression(line):
 
 def simple_expression__(line):
     if (line[0][0][TOKEN] in addOperators):
+    ############ SEMANTICO #############
+        if typeVerifier == 'boolean': 
+            sys.exit('10 - ERRO SEMANTICO: ERRO DE TIPO') 
+    ############ /SEMANTICO #############        
         line[0].remove(line[0][0])
         term(line)
         simple_expression__(line)
@@ -263,6 +279,10 @@ def op_aditive(line):
 
 def op_multiplicative(line):
     if (line[0][0][TOKEN] in multOperators):
+    ############ SEMANTICO #############
+        if typeVerifier == 'boolean': 
+            sys.exit('11 - ERRO SEMANTICO: ERRO DE TIPO') 
+    ############ /SEMANTICO #############
         line[0].remove(line[0][0])
         return True
     else:
@@ -288,11 +308,8 @@ def factor(line):
     ############ SEMANTICO #############
         typeCheck = check_type(line[0][0][TOKEN])
 
-        if typeCheck == 'integer':
-            if typeVerifier == 'boolean':
-                sys.exit('4 - ERRO SEMANTICO: ERRO DE TIPO') 
-        elif typeCheck == 'real':
-            if typeVerifier == 'integer' or typeVerifier == 'boolean': 
+        if typeCheck == 'real':
+            if typeVerifier == 'integer':
                 sys.exit('5 - ERRO SEMANTICO: ERRO DE TIPO') 
         elif typeCheck == 'boolean':
             if typeVerifier == 'integer' or typeVerifier == 'real': 
@@ -364,6 +381,7 @@ def var_declaration_list(line):
                 
                 line[0].remove(line[0][0])
                 if(line[0][0][TOKEN] == ';'):
+                    typeVerifier = '' #Semantico
                     line.remove(line[0])
                     var_declaration_list__(line)
                 else:
@@ -387,6 +405,7 @@ def var_declaration_list__(line):
 
                 line[0].remove(line[0][0])
                 if(line[0][0][TOKEN] == ';'):
+                    typeVerifier = '' #Semantico
                     line.remove(line[0])
                     var_declaration_list(line)
                 else:
@@ -422,6 +441,7 @@ def list_parameters(line):
 
 def list_parameters__(line):
     if(line[0][0][TOKEN] == ';'):
+        typeVerifier = '' #Semantico
         line[0].remove(line[0][0])
         if (not list_identifiers(line)) :
             if (line[0][0][TOKEN] == ':'):
@@ -547,8 +567,3 @@ with open('./data/table.txt', 'r') as programTable:
     programLines.append(linesList) #FAZENDO FECHAMENTO DA ULTIMA LINHA
 
     syntactic_analyzer(programLines)
-    print(tableList)
-    print(tempVarList)
-    print(intVarList)
-    print(realVarList)
-    print(booleanVarList)
