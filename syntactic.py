@@ -22,7 +22,7 @@ tempVarList = list() #Semantico
 
 tableList = list() #Semantico
 
-relationalOperation = False #Semantico
+relationalTag = False #Semantico
 scopeCount = 0
 
 ###
@@ -105,7 +105,6 @@ def composed_commands(line):
 
         if(line[0][0][TOKEN] == 'end'):
         ############ SEMANTICO #############
-            global scopeCount
             scopeCount -= 1 
             if scopeCount == 0 :
                 clean_scope()
@@ -130,7 +129,18 @@ def list_commands(line):
 
 def list_commands__(line):
     if (line[0][0][TOKEN] == ';'):
-        typeVerifier = '' #Semantico
+    ############ SEMANTICO #############
+        global typeVerifier
+        global relationalTag
+
+        if not relationalTag:
+            if typeVerifier == 'boolean': 
+                sys.exit('10 - ERRO SEMANTICO: ERRO DE TIPO') 
+
+        relationalTag = False  
+
+        typeVerifier = ''
+    ############ /SEMANTICO #############  
         line.remove(line[0])
         command(line)
         list_commands__(line)
@@ -172,6 +182,14 @@ def command(line):
         if (reserved == 'if'):
             line[0].remove(line[0][0])
             expression(line)
+        
+        ############ SEMANTICO #############
+            global relationalTag
+            if not relationalTag:
+                sys.exit('13 - ERRO SEMANTICO: EXPRESSAO NAO PODE SER CONVERTIDA EM BOOLEAN')  
+            relationalTag = False
+        ############ /SEMANTICO #############
+
             if(line[0][0][TOKEN] == 'then'):
                 line.remove(line[0])
                 command(line)
@@ -182,26 +200,33 @@ def command(line):
         
         elif (reserved == 'while'):
             line[0].remove(line[0][0])
-            expression(line)
+            expression(line)        
+        ############ SEMANTICO #############
+            if not relationalTag:
+                sys.exit('14 - ERRO SEMANTICO: EXPRESSAO NAO PODE SER CONVERTIDA EM BOOLEAN')  
+            relationalTag = False
+        ############ /SEMANTICO #############
+
             if(line[0][0][TOKEN] == 'do'):
                 line.remove(line[0])
                 command(line)
                 return
             else:
                 sys.exit('7 - ERRO SINTATICO: COMANDO do ESPERADO')
+        
         #DO WHILE
-        elif (reserved == 'do'):
-            line.remove(line[0])
-            command(line)
+        # elif (reserved == 'do'):
+        #     line.remove(line[0])
+        #     command(line)
 
-            if(line[0][0][TOKEN] == ';'):
-                typeVerifier = '' #Semantico
-                line.remove(line[0])
+        #     if(line[0][0][TOKEN] == ';'):
+        #         typeVerifier = '' #Semantico
+        #         line.remove(line[0])
 
-            if (line[0][0][TOKEN] == 'while'):
-                line[0].remove(line[0][0])
-                expression(line)
-                return
+        #     if (line[0][0][TOKEN] == 'while'):
+        #         line[0].remove(line[0][0])
+        #         expression(line)
+        #         return
 
         else:
             return False
@@ -241,6 +266,8 @@ def expression(line):
     if (simple_expression(line)):
         if(line[0][0][TOKEN] in relationalOperators):
         ############ SEMANTICO #############
+            global relationalTag
+            relationalTag = True
             if typeVerifier == 'integer' or typeVerifier == 'real': 
                 sys.exit('9 - ERRO SEMANTICO: ERRO DE TIPO') 
         ############ /SEMANTICO #############
@@ -263,21 +290,13 @@ def simple_expression(line):
         return False
 
 def simple_expression__(line):
-    if (line[0][0][TOKEN] in addOperators):
-    ############ SEMANTICO #############
-        if typeVerifier == 'boolean': 
-            sys.exit('10 - ERRO SEMANTICO: ERRO DE TIPO') 
-    ############ /SEMANTICO #############        
+    if (line[0][0][TOKEN] in addOperators): 
         line[0].remove(line[0][0])
-        term(line)
+        term(line)   
         simple_expression__(line)
 
 def op_multiplicative(line):
     if (line[0][0][TOKEN] in multOperators):
-    ############ SEMANTICO #############
-        if typeVerifier == 'boolean': 
-            sys.exit('11 - ERRO SEMANTICO: ERRO DE TIPO') 
-    ############ /SEMANTICO #############
         line[0].remove(line[0][0])
         return True
     else:

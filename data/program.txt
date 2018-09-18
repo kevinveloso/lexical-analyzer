@@ -7,11 +7,10 @@ var
     x: integer;
 begin
     x:=y+2+x;
-    z:=true <> 7;
+    z:=2+4 <> (7 * 3);
     y:=2+1;
 end
 begin
-    do
-        x:=3;
-    while (x<10);
+    if(2+4 <> (7 * 3)) then
+    x:=3;
 end.
