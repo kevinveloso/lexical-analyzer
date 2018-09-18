@@ -21,9 +21,9 @@ booleanVarList = list() #Semantico
 tempVarList = list() #Semantico
 
 tableList = list() #Semantico
-usageVerifier = 0 #Semantico
 
 relationalOperation = False #Semantico
+scopeCount = 0
 
 ###
 #   Checa se a linha eh um identificador do programa
@@ -45,6 +45,8 @@ def syntactic_analyzer(line):
                 if(line[0][0][TOKEN] == 'procedure'):
                     subprograms_declarations(line)
                 if(line[0][0][TOKEN] == 'begin'):
+                    global scopeCount
+                    scopeCount += 1 #Semantico
                     composed_commands(line)
 
                 if (line[0][0][TOKEN] == '.'):
@@ -96,12 +98,19 @@ def subprogram_declaration(line):
 
 def composed_commands(line):
     if (line[0][0][TOKEN] == 'begin'):
-        # usageVerifier += 1 #Semantico
+        global scopeCount
+        scopeCount += 1 #Semantico
         line.remove(line[0])
         options_commands(line)
 
         if(line[0][0][TOKEN] == 'end'):
-            # usageVerifier -= 1 #Semantico
+        ############ SEMANTICO #############
+            global scopeCount
+            scopeCount -= 1 
+            if scopeCount == 0 :
+                clean_scope()
+        ############ /SEMANTICO #############
+
             line[0].remove(line[0][0])
 
             if (len(line[0]) == 0):
@@ -138,7 +147,7 @@ def command(line):
                 del tableList[index]
                 index -= 1 
     
-            sys.exit('2 - ERRO SEMANTICO: VARIAVEL NAO DECLARADA')  
+            sys.exit('12 - ERRO SEMANTICO: VARIAVEL NAO DECLARADA')  
 
         global typeVerifier
         typeVerifier = check_type(line[0][0][TOKEN])
@@ -291,6 +300,8 @@ def factor(line):
 
     if (line[0][0][CLASS] == 'IDENTIFICADOR'):
         
+        check_in_scope(line[0][0][TOKEN])
+
     ############ SEMANTICO #############
         typeCheck = check_type(line[0][0][TOKEN])
 
@@ -443,7 +454,7 @@ def list_identifiers(line):
     isListID = False
     if(line[0][0][CLASS] == 'IDENTIFICADOR'):
     
-        check_in_scope(line[0][0][TOKEN]) #Semantico
+        check_in_scope_declaration(line[0][0][TOKEN]) #Semantico
 
         line[0].remove(line[0][0])
         isListID = list_identifiers__(line)
@@ -455,7 +466,7 @@ def list_identifiers__(line):
         line[0].remove(line[0][0])
         if(line[0][0][CLASS] == 'IDENTIFICADOR'):
             
-            check_in_scope(line[0][0][TOKEN]) #Semantico
+            check_in_scope_declaration(line[0][0][TOKEN]) #Semantico
 
             line[0].remove(line[0][0])
             list_identifiers__(line)
@@ -469,7 +480,7 @@ def list_identifiers__(line):
 # Chegagem se o identificador esta no escopo
 ###
 
-def check_in_scope(identifier):
+def check_in_scope_declaration(identifier):
     index = len(tableList) - 1 
     inTableList = False 
     while tableList[index] != '$': 
@@ -483,6 +494,25 @@ def check_in_scope(identifier):
 
     else:
         sys.exit('1 - ERRO SEMANTICO: IDENTIFICADOR JA DECLARADO')
+
+
+def check_in_scope(identifier):
+    index = len(tableList) - 1 
+    inScope = False 
+    while tableList[index] != '$': 
+        if tableList[index] == identifier : 
+            inScope = True 
+        index -= 1 
+    
+    if not inScope:
+        sys.exit('13 - ERRO SEMANTICO: VARIAVEL FORA DE ESCOPO')
+
+def clean_scope():
+    index = len(tableList) - 1 
+    while tableList[index] != '$': 
+        del tableList[index]
+        index -= 1 
+    del tableList[index]
 
 
 def add_in_type(token):
