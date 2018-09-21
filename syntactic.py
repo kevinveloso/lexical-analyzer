@@ -25,6 +25,8 @@ tableList = list() #Semantico
 relationalTag = False #Semantico
 scopeCount = 0
 
+procedureList = list()
+
 ###
 #   Checa se a linha eh um identificador do programa
 #   retorna true ou false
@@ -35,7 +37,7 @@ def syntactic_analyzer(line):
         tableList.append('$')  #Semantico
         
         if(line[0][1][CLASS] == "IDENTIFICADOR"):
-            tableList.append(line[0][1][TOKEN]) #Semantico
+            procedureList.append(line[0][1][TOKEN]) #Semantico
 
             if(line[0][2][TOKEN] == ";"):
                 typeVerifier = '' #Semantico
@@ -45,8 +47,6 @@ def syntactic_analyzer(line):
                 if(line[0][0][TOKEN] == 'procedure'):
                     subprograms_declarations(line)
                 if(line[0][0][TOKEN] == 'begin'):
-                    global scopeCount
-                    scopeCount += 1 #Semantico
                     composed_commands(line)
 
                 if (line[0][0][TOKEN] == '.'):
@@ -73,7 +73,12 @@ def subprogram_declaration(line):
     if(line[0][0][TOKEN] == 'procedure'):
         line[0].remove(line[0][0])
         if(line[0][0][CLASS] == 'IDENTIFICADOR'):
-            tableList.append(line[0][0][TOKEN]) #Semantico
+
+            for procedure in procedureList:
+                if procedure == line[0][0][TOKEN]:
+                    sys.exit('16 - ERRO SEMANTICO: PROCEDIMENTO JA DECLARADO')
+            
+            procedureList.append(line[0][0][TOKEN]) #Semantico
             tableList.append('$') #Semantico
             
             line[0].remove(line[0][0])
@@ -297,6 +302,14 @@ def simple_expression__(line):
 
 def op_multiplicative(line):
     if (line[0][0][TOKEN] in multOperators):
+        ############ SEMANTICO #############
+        if line[0][0][TOKEN] == 'and':
+            global relationalTag
+            if typeCheck != 'boolean' and not relationalTag:
+                sys.exit('14 - ERRO SEMANTICO: ERRO DE TIPO')
+            relationalTag  = True
+        ############ /SEMANTICO #############
+
         line[0].remove(line[0][0])
         return True
     else:
@@ -322,8 +335,8 @@ def factor(line):
         check_in_scope(line[0][0][TOKEN])
 
     ############ SEMANTICO #############
+        global typeCheck
         typeCheck = check_type(line[0][0][TOKEN])
-
         if typeCheck == 'real':
             if typeVerifier == 'integer':
                 sys.exit('5 - ERRO SEMANTICO: ERRO DE TIPO') 
@@ -347,12 +360,13 @@ def factor(line):
             return True
 
     elif (line[0][0][CLASS] == 'INTEIRO'):
+        typeCheck = 'integer'
         line[0].remove(line[0][0])
         return True
         
     elif (line[0][0][CLASS] == 'REAL'):
-
     ############ SEMANTICO #############
+        typeCheck = 'real'
         if typeVerifier == 'integer': 
             sys.exit('7 - ERRO SEMANTICO: ERRO DE TIPO') 
     ############ /SEMANTICO #############
@@ -361,6 +375,7 @@ def factor(line):
         
     elif (line[0][0][TOKEN] == 'true') or (line[0][0][TOKEN] == 'false'):
     ############ SEMANTICO #############
+        typeCheck = 'boolean'
         if typeVerifier == 'integer' or typeVerifier == 'real': 
             sys.exit('8 - ERRO SEMANTICO: ERRO DE TIPO') 
     ############ /SEMANTICO ############# 

@@ -1,7 +1,8 @@
 program teste;
 var
-    x: real;
-procedure limpar(y:integer);
+    test: real;
+    x: integer;
+procedure test(y:integer);
 var
     z:boolean;
     x: integer;
@@ -11,6 +12,6 @@ begin
     y:=2+1;
 end
 begin
-    if(2+4 <> (7 * 3)) then
+    if((x<test) and true) then
     x:=3;
 end.
