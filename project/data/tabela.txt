@@ -1,0 +1,8 @@
+Aquele DET det
+aluno NOUN nsubj
+obteve VERB ROOT
+hoje ADV advmod
+um DET det
+resultado NOUN obj
+excelente ADJ amod
+. PUNCT punct
