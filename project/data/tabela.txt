@@ -1,8 +1,6 @@
-Aquele DET det
-aluno NOUN nsubj
-obteve VERB ROOT
-hoje ADV advmod
-um DET det
-resultado NOUN obj
-excelente ADJ amod
+O DET det
+rato NOUN ROOT
+roeu VERB amod
+a DET det
+roupa NOUN nmod
 . PUNCT punct
