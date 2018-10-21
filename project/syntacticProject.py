@@ -90,6 +90,5 @@ with open('./data/tabela.txt', 'r') as projectTable:
         officialList.append(palavra)
     
 
-    # print(officialList)
 
     project_syntactic(officialList)

@@ -1,6 +1,4 @@
-O DET det
+O DET ROOT
 rato NOUN ROOT
-roeu VERB amod
-a DET det
-roupa NOUN nmod
+roeram VERB ROOT
 . PUNCT punct
