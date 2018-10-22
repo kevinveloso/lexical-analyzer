@@ -85,7 +85,7 @@ for item in params:
     r = requests.get('http://www.dicionarioweb.com.br/' + item)
     
     if r.status_code == 404:
-        mytext = 'A palavra '+ count + ' está escrita incorretamente'
+        mytext = 'A palavra ' + str(count) + ' está escrita incorretamente'
         myobj = gTTS(text=mytext, lang=LANGUAGE, slow=False) 
         myobj.save("escritaincorreta_erro.mp3") 
         os.system("mpg321 escritaincorreta_erro.mp3") 
@@ -121,5 +121,7 @@ if len(resp['matches']) > 0:
 for palavra in projectTable:
     palavra = re.split(r'\s', palavra)
     officialList.append(palavra)
+
+
 
 project_syntactic(officialList)
